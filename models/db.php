@@ -71,7 +71,7 @@ class DB {
 
 	public function insertRecord($table, $data){
 
-		$query = "INSERT INTO {$table} " . $this->formatInsertFieldsAndValues($data);
+		$query = "INSERT INTO {$table} " . $this->formatFieldsAndValues($data);
 		
 		$bindings = $this->getBindings($data);
 
@@ -81,15 +81,14 @@ class DB {
 	}
 
 
-	private function formatInsertFieldsAndValues($data){
-		$fields = '(';
-		$values = 'VALUES(';
+	private function formatFieldsAndValues($data){
+		$query = 'SET ';
+		
 		foreach ($data as $field => $value) {
-			$fields .= $field .',';
-			$values .= ':' . $field .',';
+			$query .= $field .' = :' . $field .',';
 		}
 
-		return rtrim($fields, ',') .') '. rtrim($values , ',') . ') ';
+		return rtrim($query, ',');
 	}
 
 
@@ -103,8 +102,14 @@ class DB {
 	}
 
 
-	public function update($data){
-		$query = "UPDATE {$table} SET ";
+	public function update($table, $data, $conditions){
+		$query = "UPDATE {$table} " . $this->formatFieldsAndValues($data);
+
+		$bindings = $this->getBindings($data);
+
+		$stmt = $this->conn->prepare($query);
+
+		return $stmt->execute($bindings);
 	}
 
 	/**

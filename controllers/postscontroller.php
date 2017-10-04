@@ -56,4 +56,9 @@ class PostsController {
 		];
 		return $this->post->select($data)[0];
 	}
+
+
+	public function editPost($id, $data){
+		return $this->post->update('posts', $data);
+	}
 }

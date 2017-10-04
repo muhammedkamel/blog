@@ -28,7 +28,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
         header('HTTP/1.1 503 Service Temporarily Unavailable');
     }
 }elseif(isset($_POST['action']) && $_POST['action'] == 'update' && !empty($_POST['data'])){
-    if($postsController->editPost($_POST['data'])){
+    if($postsController->editPost($_POST['id'], $_POST['data'])){
         echo json_encode(['success' => true]);
         exit;
     }else{
@@ -230,41 +230,42 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
                     date        = data.date;
                 });
             }
-
+            
             var body = id+'<div class="form-group">\
-                            <label for="title" class="control-label">Title</label>\
-                            <input type="text" name="title" id="title" class="form-control" placeholder="Title" value="'+title+'">\
-                        </div>\
-                        <div class="form-group">\
-                            <label for="body" class="control-label">Body</label>\
-                            <textarea name="body" id="body" cols="30" rows="10" class="form-control" placeholder="Body here">'+body+'</textarea>\
-                        </div>\
-                        <div class="form-group">\
-                            <label for="summery" class="control-label">Summery</label>\
-                            <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here">'+summery+'</textarea>\
-                        </div>\
-                        <div class="form-group">\
-                            <label for="status" class="control-label">Status</label>\
-                            <select id="status" name="status">\
-                             <?php foreach($statuses as $status): ?>\
-                                <option value="<?= $status->id;?>" <?php if($status->id == $status_id) echo 'selected';?>><?= $status->status;?></option>\
-                             <?php endforeach ?>\
-                            </select>\
-                        </div>\
-                        <div class="container">\
-                            <div class="row">\
-                                <div class="col-sm-6">\
-                                    <div class="form-group">\
-                                        <div class="input-group date" id="publish-date">\
-                                            <input type="text" class="form-control" id="date" value="'+date+'"/>\
-                                            <span class="input-group-addon">\
-                                            <span class="glyphicon glyphicon-calendar"></span>\
-                                            </span>\
-                                        </div>\
+                        <label for="title" class="control-label">Title</label>\
+                        <input type="text" name="title" id="title" class="form-control" placeholder="Title" value="'+title+'">\
+                    </div>\
+                    <div class="form-group">\
+                        <label for="body" class="control-label">Body</label>\
+                        <textarea name="body" id="body" cols="30" rows="10" class="form-control" placeholder="Body here">'+body+'</textarea>\
+                    </div>\
+                    <div class="form-group">\
+                        <label for="summery" class="control-label">Summery</label>\
+                        <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here">'+summery+'</textarea>\
+                    </div>\
+                    <div class="form-group">\
+                        <label for="status" class="control-label">Status</label>\
+                        <select id="status" name="status">\
+                         <?php foreach($statuses as $status): ?>\
+                            <option value="<?= $status->id;?>" <?php if($status->id == $status_id) echo 'selected';?>><?= $status->status;?></option>\
+                         <?php endforeach ?>\
+                        </select>\
+                    </div>\
+                    <div class="container">\
+                        <div class="row">\
+                            <div class="col-sm-6">\
+                                <div class="form-group">\
+                                    <div class="input-group date" id="publish-date">\
+                                        <input type="text" class="form-control" id="date" value="'+date+'"/>\
+                                        <span class="input-group-addon">\
+                                        <span class="glyphicon glyphicon-calendar"></span>\
+                                        </span>\
                                     </div>\
                                 </div>\
                             </div>\
-                        </div>';
+                        </div>\
+                    </div>';
+                 
             return body;
         }
 

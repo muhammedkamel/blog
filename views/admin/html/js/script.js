@@ -4,6 +4,7 @@ $(function(){
 	$(document).on('click', '#edit-post-btn', function(){
 		console.log('edit post');
 		// get values
+		var id 			= parseInt($('#edit-post input[name="id"]').val());
 		var data 		= {};
 		data.title 		= $('#title').val();
 		data.body 		= $('#body').val();
@@ -14,7 +15,7 @@ $(function(){
 		$.ajax({
 			url: 	'posts.php',
 			method: 'POST',
-			data: 	{action: 'update', data: data},
+			data: 	{id: id,action: 'update', data: data}
 		}).done(function(){
 			window.location.reload();
 		});
