@@ -1,44 +1,56 @@
 $(function(){
 	
-	// add an action to add new post
-	$(document).on('click', '#add-post-btn', function(){
+
+	$(document).on('click', '#edit-post-btn', function(){
+		console.log('edit post');
 		// get values
 		var data 		= {};
 		data.title 		= $('#title').val();
 		data.body 		= $('#body').val();
 		data.summery 	= $('#summery').val();
-		data.status 	= parseInt($('#status').val());
-		data.publish_at = $('#publish-date').val();
-		data.action 	= 'add';
+		data.status_id 	= parseInt($('#status').val());
+		data.publish_at = $('#publish-date #date').val();
+
 		$.ajax({
 			url: 	'posts.php',
 			method: 'POST',
-			data: 	data
+			data: 	{action: 'update', data: data},
 		}).done(function(){
-			console.log('success');
+			window.location.reload();
+		});
+	});
+
+	// add an action to add new post
+	$(document).on('click', '#add-post-btn', function(){
+		console.log('add post');
+		// get values
+		var data 		= {};
+		data.title 		= $('#title').val();
+		data.body 		= $('#body').val();
+		data.summery 	= $('#summery').val();
+		data.status_id 	= parseInt($('#status').val());
+		data.publish_at = $('#publish-date #date').val();
+
+		$.ajax({
+			url: 	'posts.php',
+			method: 'POST',
+			data: 	{action: 'add', data: data},
+		}).done(function(){
+			window.location.reload();
 		});
 	});
 
 	
-    $('#posts').on('click', '.edit', function(){
-        console.log(this);
-        $.ajax({
-            url: '../../../'
-        }).done(function(){
-
-        });
-    });
 
 	var options = {
 		autoclose: true,
 	    format: 'dd/mm/yyyy',
 	    todayHighlight: true
 	};
-
-	$(document).on('click', function(){
-		$('#publish-date').datepicker(options);
-	});
 	
+	$(document).on('click', '#publish-date', function(){
+		$(this).datetimepicker();
+	});
 
 });
 

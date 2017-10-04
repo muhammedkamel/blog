@@ -5,11 +5,35 @@ $postsController    = new PostsController;
 $posts              = $postsController->paginatePostsWithStatus(0, 10);
 $statusesController = new StatusesController;
 $statuses           = $statusesController->getAllStatuses();
+$status_id          = 0;
 
-if(isset($_POST['add'], $_POST['data']) && empty($_POST['data'])){
-    // add post
-    $postscontroller->addNewPost($_POST['data']);
+if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data'])){
+    // add post    
+    if($postsController->addNewPost($_POST['data'])){
+        echo json_encode(['success' => true]);
+        exit;
+    }else{
+        header('HTTP/1.1 503 Service Temporarily Unavailable');
+    }
 
+}elseif(isset($_POST['action']) && $_POST['action'] == 'edit' && ($id = intval($_POST['id'])) > 0){
+    if($post = $postsController->getPostByID($id)){
+        // get the post status
+        // $post->status = $statuses[$post->status_id - 1]->status;
+        $status_id = $post->status_id;
+        header('Content-Type: application/json');
+        echo json_encode($post);
+        exit;
+    }else{
+        header('HTTP/1.1 503 Service Temporarily Unavailable');
+    }
+}elseif(isset($_POST['action']) && $_POST['action'] == 'update' && !empty($_POST['data'])){
+    if($postsController->editPost($_POST['data'])){
+        echo json_encode(['success' => true]);
+        exit;
+    }else{
+        header('HTTP/1.1 503 Service Temporarily Unavailable');
+    }
 }
 
 ?>
@@ -41,6 +65,7 @@ if(isset($_POST['add'], $_POST['data']) && empty($_POST['data'])){
     <link href="css/style.css" rel="stylesheet">
     <!-- color CSS -->
     <link href="css/colors/default.css" id="theme" rel="stylesheet">
+    <link rel="stylesheet" href="bootstrap-datetimepicker/bootstrap-datetimepicker.min.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -124,13 +149,14 @@ if(isset($_POST['add'], $_POST['data']) && empty($_POST['data'])){
                             <tbody>
                                 <?php foreach($posts as $post): ?>
                                 <tr>
-                                    <td><?php echo $post->id; ?></td>
-                                    <td><?php echo $post->title;?></td>
-                                    <td><?php echo $post->summery;?></td>
-                                    <td><?php echo $post->body;?></td>
-                                    <td><?php echo $post->publish_at;?></td>
-                                    <td><?php echo $post->status;?></td>
+                                    <td><?= $post->id; ?></td>
+                                    <td><?= $post->title;?></td>
+                                    <td><?= $post->summery;?></td>
+                                    <td><?= $post->body;?></td>
+                                    <td><?= $post->publish_at;?></td>
+                                    <td><?= $post->status;?></td>
                                     <td>
+                                        <input type="hidden" name="id" value="<?= $post->id;?>">
                                         <button class="btn btn-success edit"><i class="glyphicon glyphicon-edit"></i></button>
                                         <button class="btn btn-danger delete"><i class="glyphicon glyphicon-trash"></i></button>
                                     </td>
@@ -157,6 +183,10 @@ if(isset($_POST['add'], $_POST['data']) && empty($_POST['data'])){
     <!-- ============================================================== -->
     <script src="../plugins/bower_components/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap Core JavaScript -->
+    <script src="bootstrap-datetimepicker/moment.min.js"></script>
+    <script src="bootstrap-datetimepicker/transition.js"></script>
+    <script src="bootstrap-datetimepicker/collapse.js"></script>
+    
     <script src="bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- Menu Plugin JavaScript -->
     <script src="../plugins/bower_components/sidebar-nav/dist/sidebar-nav.min.js"></script>
@@ -176,38 +206,90 @@ if(isset($_POST['add'], $_POST['data']) && empty($_POST['data'])){
     <script src="js/custom.min.js"></script>
     <script src="js/dashboard1.js"></script>
     <script src="../plugins/bower_components/toast-master/js/jquery.toast.js"></script>
-    <script src="bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>
     <script src="js/script.js"></script>
     <script>
+
+        function makeBody(ele){
+            var id = title = body = summery = status = status_id = date = '';
+
+            if(typeof ele === 'undefined') ele = null;
+
+            if(ele){
+                var id = $(ele).parent().children('input[name="id"]').val();
+                $.ajax({
+                    url:    'posts.php',
+                    method: 'POST',
+                    data: {action: 'edit', id: id}
+                }).done(function(data){
+                    id          = '<input type="hidden" name="id" value="'+data.id+'">';
+                    title       = data.title;
+                    body        = data.body;
+                    summery     = data.summery;
+                    status_id   = data.status_id;
+                    date        = data.date;
+                });
+            }
+
+            var body = id+'<div class="form-group">\
+                            <label for="title" class="control-label">Title</label>\
+                            <input type="text" name="title" id="title" class="form-control" placeholder="Title" value="'+title+'">\
+                        </div>\
+                        <div class="form-group">\
+                            <label for="body" class="control-label">Body</label>\
+                            <textarea name="body" id="body" cols="30" rows="10" class="form-control" placeholder="Body here">'+body+'</textarea>\
+                        </div>\
+                        <div class="form-group">\
+                            <label for="summery" class="control-label">Summery</label>\
+                            <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here">'+summery+'</textarea>\
+                        </div>\
+                        <div class="form-group">\
+                            <label for="status" class="control-label">Status</label>\
+                            <select id="status" name="status">\
+                             <?php foreach($statuses as $status): ?>\
+                                <option value="<?= $status->id;?>" <?php if($status->id == $status_id) echo 'selected';?>><?= $status->status;?></option>\
+                             <?php endforeach ?>\
+                            </select>\
+                        </div>\
+                        <div class="container">\
+                            <div class="row">\
+                                <div class="col-sm-6">\
+                                    <div class="form-group">\
+                                        <div class="input-group date" id="publish-date">\
+                                            <input type="text" class="form-control" id="date" value="'+date+'"/>\
+                                            <span class="input-group-addon">\
+                                            <span class="glyphicon glyphicon-calendar"></span>\
+                                            </span>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </div>';
+            return body;
+        }
+
         $(function(){
+            $('#posts').on('click', '.edit', function(){
+                var body = makeBody(this);
+                data = {
+                    id: 'edit-post',
+                    size: 'lg',
+                    title: 'Edit Post',
+                    body:  body,
+                    footer: true,
+                    autohide: true
+                }
+                generateModal(data);
+            });
+
             // show add post modal
             $('#add').on('click', function(){
                 console.log('clicked');
-                var body = '<div class="form-group">\
-                    <label for="title" class="control-label">Title</label>\
-                    <input type="text" name="title" id="title" class="form-control" placeholder="Title">\
-                </div>\
-                <div class="form-group">\
-                    <label for="body" class="control-label">Body</label>\
-                    <textarea name="body" id="body" cols="30" rows="10" class="form-control" placeholder="Body here"></textarea>\
-                </div>\
-                <div class="form-group">\
-                    <label for="summery" class="control-label">Summery</label>\
-                    <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here"></textarea>\
-                </div>\
-                <div class="form-group">\
-                    <label for="status" class="control-label">Status</label>\
-                    <select id="status" name="status">\
-                     <?php foreach($statuses as $status): ?>\
-                        <option value="<?= $status->id;?>"><?= $status->status;?></option>\
-                     <?php endforeach ?>\
-                    </select>\
-                </div>\
-                <div class="form-group">\
-                    <label for="publish-date" class="control-label">Publish date</label>\
-                    <input readonly type="text" name="publish-date" id="publish-date" class="form-control">\
-                </div>';
-
+                var body = makeBody();
+                // <!-- <div class="form-group">\
+                //     <label for="publish-date" class="control-label">Publish date</label>\
+                //     <input readonly type="text" name="publish-date" id="publish-date" class="form-control">\
+                // </div>'; -->
                 data = {
                     id: 'add-post',
                     size: 'lg',

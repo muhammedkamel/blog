@@ -24,6 +24,11 @@ class DB {
 
 	// $table, $fields, $offset, $limit, $where, bindings
 	public function select($data) {
+
+		if(!isset($data['fields'])){
+			$data['fields'] = '*';
+		}
+
 		$fields = ($data['fields'] == '*') ? '*' : implode(',', $data['fields']);
 				
 		if(!isset($data['where']) && empty($data['where'])){
@@ -33,10 +38,10 @@ class DB {
 		
 		$query 	= "SELECT {$fields} FROM {$data['table']} {$data['where']} ";
 		
-		if(isset($data['offset'], $data['limit']) && ($data['offset'] >= 0) && $data['limit']){
+		if(isset($data['offset'], $data['limit']) && ($data['offset'] >= 0) && ($data['limit'] > 0)){
 			$query .= "LIMIT {$data['limit']} OFFSET {$data['offset']}";
-		}elseif($data['limit']){
-			$query .= "LIMIT {$limit}";
+		}elseif(isset($data['limit']) && $data['limit'] > 0){
+			$query .= "LIMIT {$data['limit']}";
 		}
 		
 		$stmt 	= $this->conn->prepare($query);
@@ -60,6 +65,46 @@ class DB {
 		    $result[] = $row;
 		}
 		return $result;
+	}
+
+
+
+	public function insertRecord($table, $data){
+
+		$query = "INSERT INTO {$table} " . $this->formatInsertFieldsAndValues($data);
+		
+		$bindings = $this->getBindings($data);
+
+		$stmt = $this->conn->prepare($query);
+
+		return $stmt->execute($bindings);
+	}
+
+
+	private function formatInsertFieldsAndValues($data){
+		$fields = '(';
+		$values = 'VALUES(';
+		foreach ($data as $field => $value) {
+			$fields .= $field .',';
+			$values .= ':' . $field .',';
+		}
+
+		return rtrim($fields, ',') .') '. rtrim($values , ',') . ') ';
+	}
+
+
+
+	private function getBindings($data){
+		$bindings = [];
+		foreach ($data as $field => $value) {
+			$bindings[':'.$field] = $value;
+		}
+		return $bindings;
+	}
+
+
+	public function update($data){
+		$query = "UPDATE {$table} SET ";
 	}
 
 	/**

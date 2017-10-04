@@ -1,13 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.4.1deb2ubuntu2
--- http://www.phpmyadmin.net
+-- version 4.7.4
+-- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Oct 04, 2017 at 12:18 AM
--- Server version: 5.7.19-0ubuntu0.16.04.1
--- PHP Version: 7.0.22-0ubuntu0.16.04.1
+-- Host: 127.0.0.1
+-- Generation Time: Oct 04, 2017 at 11:32 AM
+-- Server version: 10.1.26-MariaDB
+-- PHP Version: 7.1.9
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -73,7 +75,7 @@ CREATE TABLE `posts` (
   `title` varchar(200) NOT NULL,
   `summery` varchar(500) NOT NULL,
   `body` text NOT NULL,
-  `publish_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `publish_at` timestamp NULL DEFAULT NULL,
   `status_id` int(11) NOT NULL,
   `admin_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -89,7 +91,11 @@ INSERT INTO `posts` (`id`, `title`, `summery`, `body`, `publish_at`, `status_id`
 (5, 'title 4', 'summery 4', 'body 4', '2017-10-03 14:52:24', 1, 1),
 (6, 'title 5', 'summery 5', 'body 5', '2017-10-03 14:52:24', 1, 1),
 (7, 'title 6', 'summery 6', 'body 6', '2017-10-03 14:52:24', 2, 1),
-(8, 'title 7', 'summery 7', 'body 7', '2017-10-03 14:52:24', 2, 1);
+(8, 'title 7', 'summery 7', 'body 7', '2017-10-03 14:52:24', 2, 1),
+(9, 'Title 9', 'Summery 9', 'Body 9', '0000-00-00 00:00:00', 1, 0),
+(10, '', '', '', '0000-00-00 00:00:00', 1, 0),
+(11, 'hamada', 'hamada', 'hamamda', '0000-00-00 00:00:00', 1, 0),
+(12, 'dfghtr', '', 'rteyt', '0000-00-00 00:00:00', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -156,21 +162,26 @@ ALTER TABLE `statuses`
 --
 ALTER TABLE `admins`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 --
 -- AUTO_INCREMENT for table `banned_ips`
 --
 ALTER TABLE `banned_ips`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
 --
 -- AUTO_INCREMENT for table `statuses`
 --
 ALTER TABLE `statuses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
