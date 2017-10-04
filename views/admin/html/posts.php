@@ -1,3 +1,18 @@
+<?php 
+require_once __DIR__.'/../../../controllers/postscontroller.php'; 
+require_once __DIR__.'/../../../controllers/statusescontroller.php'; 
+$postsController    = new PostsController;
+$posts              = $postsController->paginatePostsWithStatus(0, 10);
+$statusesController = new StatusesController;
+$statuses           = $statusesController->getAllStatuses();
+
+if(isset($_POST['add'], $_POST['data']) && empty($_POST['data'])){
+    // add post
+    $postscontroller->addNewPost($_POST['data']);
+
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -107,29 +122,20 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php foreach($posts as $post): ?>
                                 <tr>
-                                    <td>1</td>
-                                    <td>title</td>
-                                    <td>summery</td>
-                                    <td>body</td>
-                                    <td>publish date</td>
-                                    <td>draft</td>
-                                    <td>
-                                        <button class="btn btn-success edit"><i class="glyphicon glyphicon-edit"></i></button>
-                                        <button class="btn btn-danger delete"><i class="glyphicon glyphicon-trash"></i></button>
-                                    </td>
-                                </tr><tr>
-                                    <td>2</td>
-                                    <td>title</td>
-                                    <td>summery</td>
-                                    <td>body</td>
-                                    <td>publish date</td>
-                                    <td>active</td>
+                                    <td><?php echo $post->id; ?></td>
+                                    <td><?php echo $post->title;?></td>
+                                    <td><?php echo $post->summery;?></td>
+                                    <td><?php echo $post->body;?></td>
+                                    <td><?php echo $post->publish_at;?></td>
+                                    <td><?php echo $post->status;?></td>
                                     <td>
                                         <button class="btn btn-success edit"><i class="glyphicon glyphicon-edit"></i></button>
                                         <button class="btn btn-danger delete"><i class="glyphicon glyphicon-trash"></i></button>
                                     </td>
                                 </tr>
+                                <?php endforeach ?>
                             </tbody>
                         </table>
                     </div>
@@ -174,6 +180,7 @@
     <script src="js/script.js"></script>
     <script>
         $(function(){
+            // show add post modal
             $('#add').on('click', function(){
                 console.log('clicked');
                 var body = '<div class="form-group">\
@@ -187,6 +194,14 @@
                 <div class="form-group">\
                     <label for="summery" class="control-label">Summery</label>\
                     <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here"></textarea>\
+                </div>\
+                <div class="form-group">\
+                    <label for="status" class="control-label">Status</label>\
+                    <select id="status" name="status">\
+                     <?php foreach($statuses as $status): ?>\
+                        <option value="<?= $status->id;?>"><?= $status->status;?></option>\
+                     <?php endforeach ?>\
+                    </select>\
                 </div>\
                 <div class="form-group">\
                     <label for="publish-date" class="control-label">Publish date</label>\
@@ -203,16 +218,9 @@
                 }
                 generateModal(data);
             });
-        });
 
-        $('#posts').on('click', '.edit', function(){
-            console.log(this);
-            $.ajax({
-                url: '../../../'
-            }).done(function(){
-
-            });
         });
+        
     </script>
 
 </body>

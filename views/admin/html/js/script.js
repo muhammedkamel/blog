@@ -1,4 +1,34 @@
 $(function(){
+	
+	// add an action to add new post
+	$(document).on('click', '#add-post-btn', function(){
+		// get values
+		var data 		= {};
+		data.title 		= $('#title').val();
+		data.body 		= $('#body').val();
+		data.summery 	= $('#summery').val();
+		data.status 	= parseInt($('#status').val());
+		data.publish_at = $('#publish-date').val();
+		data.action 	= 'add';
+		$.ajax({
+			url: 	'posts.php',
+			method: 'POST',
+			data: 	data
+		}).done(function(){
+			console.log('success');
+		});
+	});
+
+	
+    $('#posts').on('click', '.edit', function(){
+        console.log(this);
+        $.ajax({
+            url: '../../../'
+        }).done(function(){
+
+        });
+    });
+
 	var options = {
 		autoclose: true,
 	    format: 'dd/mm/yyyy',
@@ -9,6 +39,7 @@ $(function(){
 		$('#publish-date').datepicker(options);
 	});
 	
+
 });
 
 

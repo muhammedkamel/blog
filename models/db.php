@@ -54,8 +54,6 @@ class DB {
 	// 	}
 	// 	return ['where_stmt' => $where_stmt, 'bindings' => $bindings];
 	// }
-
-
 	private function getResults($stmt){
 		$result = [];
 		while ($row = $stmt->fetchObject()) {
