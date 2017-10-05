@@ -113,6 +113,28 @@ class DB {
 	}
 
 	/**
+	*/
+	public function deleteByID($table, $id){
+		return $this->delete('posts', 'WHERE id = :id', [':id' => $id], 1);
+	}
+
+	/**
+	* Method to delete from db
+	* @param $table string the table name to delete from it
+	* @param $where string the where statment starts by "WHERE"
+	* @param $bindings associative array of the bingings like [':id' => 1]
+	* @param $limit int number of rows that you want to delete them using the where condition
+	* @return boolean the query status
+	*/
+	public function delete($table, $where = '', $bindings = [], $limit = ''){
+		if($limit) $limit = 'LIMIT '.$limit;
+		$query 	= "DELETE FROM {$table} {$where} {$limit}";
+		$stmt 	= $this->conn->prepare($query);
+
+		return $stmt->execute($bindings);
+	}
+
+	/**
 	 *
 	 * destructor to destroy connection
 	 *

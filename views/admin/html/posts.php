@@ -2,7 +2,8 @@
 require_once __DIR__.'/../../../controllers/postscontroller.php'; 
 require_once __DIR__.'/../../../controllers/statusescontroller.php'; 
 $postsController    = new PostsController;
-$posts              = $postsController->paginatePostsWithStatus(0, 10);
+// offset starts with 0 then increases
+$posts              = $postsController->paginatePostsWithStatus(0);
 $statusesController = new StatusesController;
 $statuses           = $statusesController->getAllStatuses();
 $status_id          = 0;
@@ -29,6 +30,13 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
     }
 }elseif(isset($_POST['action']) && $_POST['action'] == 'update' && !empty($_POST['data'])){
     if($postsController->editPost($_POST['id'], $_POST['data'])){
+        echo json_encode(['success' => true]);
+        exit;
+    }else{
+        header('HTTP/1.1 503 Service Temporarily Unavailable');
+    }
+}elseif(isset($_POST['action']) && $_POST['action'] == 'delete' && ($id = intval($_POST['id'])) > 0){
+    if($postsController->deletePost($id)){
         echo json_encode(['success' => true]);
         exit;
     }else{
@@ -271,7 +279,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
 
             if(ele){
                 var id = $(ele).parent().children('input[name="id"]').val();
-                return $.when(getPostData(id)).done(buildHTMLBody('hamada'));
+                return $.when(getPostData(id)).then(buildHTMLBody('hamada'));
             }else{
                 return buildHTMLBody(postID, title, body, summery, status_id, date);
             }
@@ -286,7 +294,27 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
                     size: 'lg',
                     title: 'Edit Post',
                     body:  body,
-                    footer: true,
+                    footer: {cancel: 'Cancel', confirm: 'Save'},
+                    autohide: true
+                }
+                generateModal(data);
+            });
+
+
+            // delete post
+            $('#posts').on('click', '.delete', function(){
+                var postID  = parseInt($(this).parent().children('input[name="id"]').val());
+                var body    = '<input type="hidden" value="'+postID+'">'+'<div class="alert alert-warning" role="alert">\
+                              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>\
+                              <span class="sr-only">Error:</span>\
+                              <strong> Are you sure that you want to delete this post?</strong>\
+                            </div>';
+                data = {
+                    id: 'delete-post',
+                    size: 'lg',
+                    title: 'Delete Post',
+                    body:  body,
+                    footer: {cancel: 'No', confirm: 'Yes'},
                     autohide: true
                 }
                 generateModal(data);
@@ -305,7 +333,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
                     size: 'lg',
                     title: 'Add New Post',
                     body:  body,
-                    footer: true,
+                    footer: {cancel: 'Cancel', confirm: 'Save'},
                     autohide: true
                 }
                 generateModal(data);

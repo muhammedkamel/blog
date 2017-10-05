@@ -1,6 +1,19 @@
 $(function(){
 	
+	$(document).on('click', '#delete-post-btn', function(){
+		console.log('delete post');
+		var postID = $('#delete-post > div > div > div.modal-body > input[type="hidden"]').val();
 
+		$.ajax({
+			url: 	'posts.php',
+			method: 'POST',
+			data: 	{id: postID,action: 'delete'}
+		}).done(function(){
+			window.location.reload();
+		});
+	});
+
+	// edit post
 	$(document).on('click', '#edit-post-btn', function(){
 		console.log('edit post');
 		// get values
@@ -59,8 +72,8 @@ $(function(){
 function generateFooter(data){
 	if(data.footer){
 		return '<div class="modal-footer">\
-			        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>\
-			        <button type="button" class="btn btn-success" id="'+data.id+'-btn">Save</button>\
+			        <button type="button" class="btn btn-danger" data-dismiss="modal">'+data.footer.cancel+'</button>\
+			        <button type="button" class="btn btn-success" id="'+data.id+'-btn">'+data.footer.confirm+'</button>\
 		      	</div>';
 	}
 	return '';

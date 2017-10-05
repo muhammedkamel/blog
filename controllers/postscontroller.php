@@ -9,26 +9,26 @@ class PostsController {
 		$this->post = new Post;
 	}
 
-	public function paginatePosts($offset, $limit){
+	public function paginatePosts($offset){
 		$data = [
 			'table' 	=> 'posts',
 			'fields'	=> '*',
 			'offset'	=> $offset,
-			'limit'		=> $limit
+			'limit'		=> PAGINATE
 		];
 
 		return $this->post->select($data);
 	}
 
 
-	public function paginatePostsWithStatus($offset, $limit){
+	public function paginatePostsWithStatus($offset){
 		$data = [
 			'table' 	=> 'posts AS P, statuses AS S',
 			'fields'	=> ['P.id', 'P.title', 'P.summery', 'P.body', 'P.publish_at', 'S.status'],
 			'where'		=> 'WHERE P.status_id = S.id',
 			'bindings'	=> [],
 			'offset'	=> $offset,
-			'limit'		=> $limit
+			'limit'		=> PAGINATE
 		];
 
 		return $this->post->select($data);	
@@ -60,5 +60,10 @@ class PostsController {
 
 	public function editPost($id, $data){
 		return $this->post->update('posts', $data);
+	}
+
+
+	public function deletePost($id){
+		return $this->post->deleteByID('posts', $id);
 	}
 }
