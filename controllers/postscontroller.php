@@ -14,7 +14,7 @@ class PostsController {
 			'table' 	=> 'posts',
 			'fields'	=> '*',
 			'offset'	=> $offset,
-			'limit'		=> PAGINATE
+			'limit'		=> LIMIT
 		];
 
 		return $this->post->select($data);
@@ -28,7 +28,7 @@ class PostsController {
 			'where'		=> 'WHERE P.status_id = S.id',
 			'bindings'	=> [],
 			'offset'	=> $offset,
-			'limit'		=> PAGINATE
+			'limit'		=> LIMIT
 		];
 
 		return $this->post->select($data);	

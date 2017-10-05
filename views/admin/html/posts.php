@@ -1,47 +1,30 @@
 <?php 
-require_once __DIR__.'/../../../controllers/postscontroller.php'; 
-require_once __DIR__.'/../../../controllers/statusescontroller.php'; 
-$postsController    = new PostsController;
-// offset starts with 0 then increases
-$posts              = $postsController->paginatePostsWithStatus(0);
-$statusesController = new StatusesController;
-$statuses           = $statusesController->getAllStatuses();
-$status_id          = 0;
+require_once __DIR__.'/../../postsview.php';
+
+$postsView  = new PostsView;
+$statuses   = $postsView->getStatuses();
+// you need to check if the edit method changes it 
+$status_id  = 0;
+$offset     = 0;
 
 if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data'])){
-    // add post    
-    if($postsController->addNewPost($_POST['data'])){
-        echo json_encode(['success' => true]);
-        exit;
-    }else{
-        header('HTTP/1.1 503 Service Temporarily Unavailable');
-    }
-
+    $postsView->addPost($_POST['data']);
 }elseif(isset($_POST['action']) && $_POST['action'] == 'edit' && ($id = intval($_POST['id'])) > 0){
-    if($post = $postsController->getPostByID($id)){
-        // get the post status
-        // $post->status = $statuses[$post->status_id - 1]->status;
-        $status_id = $post->status_id;
-        header('Content-Type: application/json');
-        echo json_encode($post);
-        exit;
-    }else{
-        header('HTTP/1.1 503 Service Temporarily Unavailable');
-    }
-}elseif(isset($_POST['action']) && $_POST['action'] == 'update' && !empty($_POST['data'])){
-    if($postsController->editPost($_POST['id'], $_POST['data'])){
-        echo json_encode(['success' => true]);
-        exit;
-    }else{
-        header('HTTP/1.1 503 Service Temporarily Unavailable');
-    }
+    $postsView->getPost($id);
+}elseif(isset($_POST['action']) && $_POST['action'] == 'update' && !empty($_POST['data']) && ($id=intval($_POST['id'])) > 0){
+    $postsView->editPost($id, $_POST['data']);
 }elseif(isset($_POST['action']) && $_POST['action'] == 'delete' && ($id = intval($_POST['id'])) > 0){
-    if($postsController->deletePost($id)){
-        echo json_encode(['success' => true]);
-        exit;
-    }else{
-        header('HTTP/1.1 503 Service Temporarily Unavailable');
-    }
+    $postsView->deletePost($id);
+}
+
+
+if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
+    $pagination = $postsView->paginate($page);
+    // needs the offset from the paginator
+    $posts      = $postsView->getPosts($pagination['offset']);
+}else{
+    $pagination = $postsView->paginate();
+    $posts      = $postsView->getPosts();
 }
 
 ?>
@@ -176,6 +159,12 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
                 </div>
 
             </div>
+            <nav aria-label="pagination">
+              <ul class="pager">
+                <li><a href="?page=<?= $pagination['previous'];?>">Previous</a></li>
+                <li><a href="?page=<?= $pagination['next'];?>">Next</a></li>
+              </ul>
+            </nav>
             <!-- /.container-fluid -->
             <footer class="footer text-center"> 2017 &copy; Ample Admin brought to you by wrappixel.com </footer>
         </div>
