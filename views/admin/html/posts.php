@@ -210,63 +210,72 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
     <script src="js/script.js"></script>
     <script>
 
+        function getPostData(id){
+            $.ajax({
+                url:    'posts.php',
+                method: 'POST',
+                data: {action: 'edit', id: id}
+            }).done(function(data){
+                postID      = '<input type="hidden" name="id" value="'+data.id+'">';
+                title       = data.title;
+                body        = data.body;
+                summery     = data.summery;
+                status_id   = data.status_id;
+                date        = data.date;
+                console.log(data);
+            });
+        }
+
+        function buildHTMLBody(data){
+            console.log(data);
+            return postID+'<div class="form-group">\
+                    <label for="title" class="control-label">Title</label>\
+                    <input type="text" name="title" id="title" class="form-control" placeholder="Title" value="'+title+'">\
+                </div>\
+                <div class="form-group">\
+                    <label for="body" class="control-label">Body</label>\
+                    <textarea name="body" id="body" cols="30" rows="10" class="form-control" placeholder="Body here">'+body+'</textarea>\
+                </div>\
+                <div class="form-group">\
+                    <label for="summery" class="control-label">Summery</label>\
+                    <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here">'+summery+'</textarea>\
+                </div>\
+                <div class="form-group">\
+                    <label for="status" class="control-label">Status</label>\
+                    <select id="status" name="status">\
+                     <?php foreach($statuses as $status): ?>\
+                        <option value="<?= $status->id;?>" <?php echo $status_id; if($status->id == $status_id) echo 'selected';?>><?= $status->status;?></option>\
+                     <?php endforeach ?>\
+                    </select>\
+                </div>\
+                <div class="container">\
+                    <div class="row">\
+                        <div class="col-sm-6">\
+                            <div class="form-group">\
+                                <div class="input-group date" id="publish-date">\
+                                    <input type="text" class="form-control" id="date" value="'+date+'"/>\
+                                    <span class="input-group-addon">\
+                                    <span class="glyphicon glyphicon-calendar"></span>\
+                                    </span>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>\
+                </div>';        
+        }
+
         function makeBody(ele){
-            var id = title = body = summery = status = status_id = date = '';
+            var postID = title = body = summery = status = status_id = date = '';
 
             if(typeof ele === 'undefined') ele = null;
 
             if(ele){
                 var id = $(ele).parent().children('input[name="id"]').val();
-                $.ajax({
-                    url:    'posts.php',
-                    method: 'POST',
-                    data: {action: 'edit', id: id}
-                }).done(function(data){
-                    id          = '<input type="hidden" name="id" value="'+data.id+'">';
-                    title       = data.title;
-                    body        = data.body;
-                    summery     = data.summery;
-                    status_id   = data.status_id;
-                    date        = data.date;
-                });
+                return $.when(getPostData(id)).done(buildHTMLBody('hamada'));
+            }else{
+                return buildHTMLBody(postID, title, body, summery, status_id, date);
             }
             
-            var body = id+'<div class="form-group">\
-                        <label for="title" class="control-label">Title</label>\
-                        <input type="text" name="title" id="title" class="form-control" placeholder="Title" value="'+title+'">\
-                    </div>\
-                    <div class="form-group">\
-                        <label for="body" class="control-label">Body</label>\
-                        <textarea name="body" id="body" cols="30" rows="10" class="form-control" placeholder="Body here">'+body+'</textarea>\
-                    </div>\
-                    <div class="form-group">\
-                        <label for="summery" class="control-label">Summery</label>\
-                        <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here">'+summery+'</textarea>\
-                    </div>\
-                    <div class="form-group">\
-                        <label for="status" class="control-label">Status</label>\
-                        <select id="status" name="status">\
-                         <?php foreach($statuses as $status): ?>\
-                            <option value="<?= $status->id;?>" <?php if($status->id == $status_id) echo 'selected';?>><?= $status->status;?></option>\
-                         <?php endforeach ?>\
-                        </select>\
-                    </div>\
-                    <div class="container">\
-                        <div class="row">\
-                            <div class="col-sm-6">\
-                                <div class="form-group">\
-                                    <div class="input-group date" id="publish-date">\
-                                        <input type="text" class="form-control" id="date" value="'+date+'"/>\
-                                        <span class="input-group-addon">\
-                                        <span class="glyphicon glyphicon-calendar"></span>\
-                                        </span>\
-                                    </div>\
-                                </div>\
-                            </div>\
-                        </div>\
-                    </div>';
-                 
-            return body;
         }
 
         $(function(){
