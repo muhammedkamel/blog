@@ -38,7 +38,7 @@ class Paginator extends DB {
 	private function getNext($page, $numOfRows){
 		$numOfPages = ceil($numOfRows / LIMIT);
 		if( ($page + 1) >  $numOfPages){
-			return $numOfPages;
+			return max($numOfPages, 1);
 		}
 		return ++$page;
 	}

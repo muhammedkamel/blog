@@ -1,3 +1,32 @@
+<?php
+
+require_once __DIR__.'/../../../controllers/ipscontroller.php';
+
+
+$ipsController = new IPsController;
+$ips = [];
+
+if(isset($_POST['action'], $_POST['ip']) && $_POST['action'] == 'add' && !empty($_POST['ip'])){
+    $ipsController->banIP($_POST['ip']);
+}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'delete' && ($id = intval($_POST['id'])) > 0){
+    $ipsController->allowIP($id);
+}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'get' && ($id = intval($_POST['id'])) > 0){
+    $ipsController->getIP($id);
+}elseif(isset($_POST['action'], $_POST['id'], $_POST['ip']) && $_POST['action'] == 'edit' 
+    && ($id = intval($_POST['id'])) > 0 && !empty($_POST['ip'])){
+    $ipsController->editIP($id, $_POST['ip']);
+}
+
+if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
+    $pagination = $ipsController->paginate($page);
+    // needs the offset from the paginator
+    $ips      = $ipsController->paginateIPs($pagination['offset']);
+}else{
+    $pagination = $ipsController->paginate();
+    $ips      = $ipsController->paginateIPs();
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -87,10 +116,41 @@
             <div class="container-fluid">
 
                 <div class="row">
-
+                    <button class="btn btn-info btn-block" id="add-ip">Ban New IP <i class="glyphicon glyphicon-ban-circle"></i></button>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="ips" style="background-color: white;">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>IP</th>
+                                    <th>Control</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach($ips as $ip): ?>
+                                <tr>
+                                    <td><?= $ip->id; ?></td>
+                                    <td class="ip"><?= $ip->ip;?></td>
+                                    <td>
+                                        <input type="hidden" name="id" value="<?= $ip->id;?>">
+                                        <button class="btn btn-success edit"><i class="glyphicon glyphicon-edit"></i></button>
+                                        <button class="btn btn-danger delete"><i class="glyphicon glyphicon-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-
             </div>
+
+            <nav aria-label="pagination">
+              <ul class="pager">
+                <li><a href="?page=<?= $pagination['previous'];?>">Previous</a></li>
+                <li><a href="?page=<?= $pagination['next'];?>">Next</a></li>
+              </ul>
+            </nav>
+
             <!-- /.container-fluid -->
             <footer class="footer text-center"> 2017 &copy; Ample Admin brought to you by wrappixel.com </footer>
         </div>
@@ -125,6 +185,39 @@
     <script src="js/custom.min.js"></script>
     <script src="js/dashboard1.js"></script>
     <script src="../plugins/bower_components/toast-master/js/jquery.toast.js"></script>
+    <script src="js/script.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $('#ips').on('click', '.edit', showEditForm);
+        });
+
+
+        function showEditForm(){
+            var id = $(this).parent().children('input[name="id"]').val();
+            var body = '';
+            $.ajax({
+                url: 'banned-ips.php',
+                type: 'POST',
+                data: {action: 'get', id: id},
+            })
+            .done(function(data) {
+                body = makeIPForm(data);
+                data = {
+                    id: 'edit-ip',
+                    size: 'sm',
+                    title: 'Edit IP',
+                    body:  body,
+                    footer: {cancel: 'Cancel', confirm: 'Save'},
+                    autohide: true
+                }
+                generateModal(data);
+            });
+
+        }
+
+
+
+    </script>
 </body>
 
 </html>

@@ -102,10 +102,10 @@ class DB {
 	}
 
 
-	public function update($table, $data, $conditions){
-		$query = "UPDATE {$table} " . $this->formatFieldsAndValues($data);
-
-		$bindings = $this->getBindings($data);
+	public function update($table, $fields, $conditions, $bindings){
+		$query = "UPDATE {$table} " . $this->formatFields($fields) .' '. $conditions;
+		
+		// $bindings = $this->getBindings($data);
 
 		$stmt = $this->conn->prepare($query);
 
@@ -115,7 +115,7 @@ class DB {
 	/**
 	*/
 	public function deleteByID($table, $id){
-		return $this->delete('posts', 'WHERE id = :id', [':id' => $id], 1);
+		return $this->delete($table, "WHERE id = :id", [':id' => $id], 1);
 	}
 
 	/**
@@ -132,6 +132,17 @@ class DB {
 		$stmt 	= $this->conn->prepare($query);
 
 		return $stmt->execute($bindings);
+	}
+
+
+
+	private function formatFields($fields){
+		$query = '';
+
+		foreach($fields as $field){
+			$query .= 'SET '.$field.' = :'.$field.',';
+		}
+		return rtrim($query, ',');
 	}
 
 	/**
