@@ -2,19 +2,26 @@
 require_once __DIR__.'/../../postsview.php';
 
 $postsView  = new PostsView;
-$statuses   = $postsView->getStatuses();
+
 // you need to check if the edit method changes it 
-$status_id  = 0;
 $offset     = 0;
 
 if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data'])){
     $postsView->addPost($_POST['data']);
-}elseif(isset($_POST['action']) && $_POST['action'] == 'edit' && ($id = intval($_POST['id'])) > 0){
+}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'get' && ($id = intval($_POST['id'])) > 0){
     $postsView->getPost($id);
-}elseif(isset($_POST['action']) && $_POST['action'] == 'update' && !empty($_POST['data']) && ($id=intval($_POST['id'])) > 0){
+}elseif(isset($_POST['action']) && $_POST['action'] == 'edit' && !empty($_POST['data']) && ($id=intval($_POST['id'])) > 0){
     $postsView->editPost($id, $_POST['data']);
 }elseif(isset($_POST['action']) && $_POST['action'] == 'delete' && ($id = intval($_POST['id'])) > 0){
     $postsView->deletePost($id);
+}elseif(isset($_POST['action']) && $_POST['action'] == 'get_statuses'){
+    if($statuses = $postsView->getStatuses()){
+        header('Content-Type: application/json');
+        echo json_encode($statuses);
+        exit;
+    }else{
+        header('HTTP/1.1 503 Service Temporarily Unavailable');
+    }
 }
 
 
@@ -205,133 +212,6 @@ if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
     <script src="../plugins/bower_components/toast-master/js/jquery.toast.js"></script>
     <script src="bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>
     <script src="js/script.js"></script>
-    <script>
-
-        function getPostData(id){
-            $.ajax({
-                url:    'posts.php',
-                method: 'POST',
-                data: {action: 'edit', id: id}
-            }).done(function(data){
-                postID      = '<input type="hidden" name="id" value="'+data.id+'">';
-                title       = data.title;
-                body        = data.body;
-                summery     = data.summery;
-                status_id   = data.status_id;
-                date        = data.date;
-                console.log(data);
-            });
-        }
-
-        function buildHTMLBody(data){
-            console.log(data);
-            return postID+'<div class="form-group">\
-                    <label for="title" class="control-label">Title</label>\
-                    <input type="text" name="title" id="title" class="form-control" placeholder="Title" value="'+title+'">\
-                </div>\
-                <div class="form-group">\
-                    <label for="body" class="control-label">Body</label>\
-                    <textarea name="body" id="body" cols="30" rows="10" class="form-control" placeholder="Body here">'+body+'</textarea>\
-                </div>\
-                <div class="form-group">\
-                    <label for="summery" class="control-label">Summery</label>\
-                    <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here">'+summery+'</textarea>\
-                </div>\
-                <div class="form-group">\
-                    <label for="status" class="control-label">Status</label>\
-                    <select id="status" name="status">\
-                     <?php foreach($statuses as $status): ?>\
-                        <option value="<?= $status->id;?>" <?php echo $status_id; if($status->id == $status_id) echo 'selected';?>><?= $status->status;?></option>\
-                     <?php endforeach ?>\
-                    </select>\
-                </div>\
-                <div class="container">\
-                    <div class="row">\
-                        <div class="col-sm-6">\
-                            <div class="form-group">\
-                                <div class="input-group date" id="publish-date">\
-                                    <input type="text" class="form-control" id="date" value="'+date+'"/>\
-                                    <span class="input-group-addon">\
-                                    <span class="glyphicon glyphicon-calendar"></span>\
-                                    </span>\
-                                </div>\
-                            </div>\
-                        </div>\
-                    </div>\
-                </div>';        
-        }
-
-        function makeBody(ele){
-            var postID = title = body = summery = status = status_id = date = '';
-
-            if(typeof ele === 'undefined') ele = null;
-
-            if(ele){
-                var id = $(ele).parent().children('input[name="id"]').val();
-                return $.when(getPostData(id)).then(buildHTMLBody('hamada'));
-            }else{
-                return buildHTMLBody(postID, title, body, summery, status_id, date);
-            }
-            
-        }
-
-        $(function(){
-            $('#posts').on('click', '.edit', function(){
-                var body = makeBody(this);
-                data = {
-                    id: 'edit-post',
-                    size: 'lg',
-                    title: 'Edit Post',
-                    body:  body,
-                    footer: {cancel: 'Cancel', confirm: 'Save'},
-                    autohide: true
-                }
-                generateModal(data);
-            });
-
-
-            // delete post
-            $('#posts').on('click', '.delete', function(){
-                var postID  = parseInt($(this).parent().children('input[name="id"]').val());
-                var body    = '<input type="hidden" value="'+postID+'">'+'<div class="alert alert-warning" role="alert">\
-                              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>\
-                              <span class="sr-only">Error:</span>\
-                              <strong> Are you sure that you want to delete this post?</strong>\
-                            </div>';
-                data = {
-                    id: 'delete-post',
-                    size: 'lg',
-                    title: 'Delete Post',
-                    body:  body,
-                    footer: {cancel: 'No', confirm: 'Yes'},
-                    autohide: true
-                }
-                generateModal(data);
-            });
-
-            // show add post modal
-            $('#add').on('click', function(){
-                console.log('clicked');
-                var body = makeBody();
-                // <!-- <div class="form-group">\
-                //     <label for="publish-date" class="control-label">Publish date</label>\
-                //     <input readonly type="text" name="publish-date" id="publish-date" class="form-control">\
-                // </div>'; -->
-                data = {
-                    id: 'add-post',
-                    size: 'lg',
-                    title: 'Add New Post',
-                    body:  body,
-                    footer: {cancel: 'Cancel', confirm: 'Save'},
-                    autohide: true
-                }
-                generateModal(data);
-            });
-
-        });
-        
-    </script>
-
 </body>
 
 </html>

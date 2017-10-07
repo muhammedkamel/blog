@@ -186,38 +186,6 @@ if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
     <script src="js/dashboard1.js"></script>
     <script src="../plugins/bower_components/toast-master/js/jquery.toast.js"></script>
     <script src="js/script.js"></script>
-    <script type="text/javascript">
-        $(function(){
-            $('#ips').on('click', '.edit', showEditForm);
-        });
-
-
-        function showEditForm(){
-            var id = $(this).parent().children('input[name="id"]').val();
-            var body = '';
-            $.ajax({
-                url: 'banned-ips.php',
-                type: 'POST',
-                data: {action: 'get', id: id},
-            })
-            .done(function(data) {
-                body = makeIPForm(data);
-                data = {
-                    id: 'edit-ip',
-                    size: 'sm',
-                    title: 'Edit IP',
-                    body:  body,
-                    footer: {cancel: 'Cancel', confirm: 'Save'},
-                    autohide: true
-                }
-                generateModal(data);
-            });
-
-        }
-
-
-
-    </script>
 </body>
 
 </html>

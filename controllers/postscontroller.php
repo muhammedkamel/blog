@@ -17,7 +17,8 @@ class PostsController {
 			'limit'		=> LIMIT
 		];
 
-		return $this->post->select($data);
+		$posts = $this->formateArrayDates($this->post->select($data));
+		return $posts;
 	}
 
 
@@ -28,20 +29,21 @@ class PostsController {
 			'where'		=> 'WHERE P.status_id = S.id',
 			'bindings'	=> [],
 			'offset'	=> $offset,
-			'limit'		=> LIMIT
+			'limit'		=> LIMIT,
+			'sort'		=> 'ORDER BY P.publish_at DESC'
 		];
 
-		return $this->post->select($data);	
+		$posts = $this->formateArrayDates($this->post->select($data));
+		return $posts;	
 	}
 
 
 	public function addNewPost($data){
 		// @TODO validate data
 		// formate date to time stamp
-		$date = DateTime::createFromFormat('d/m/Y H:i A', '20/10/2014 05:39 PM');
-		$data['publish_at'] = $date->format('Y-m-d H:i:s');
+		$data['publish_at'] = $this->formateDateTime($data['publish_at']);
 		// this value will be retrieved from the session
-		$data['user_id']	= 1;
+		$data['admin_id']	= 1;
 		return $this->post->insertRecord('posts', $data);
 	}
 
@@ -54,16 +56,40 @@ class PostsController {
 			'bindings'	=> [':id' => $id],
 			'limit'		=> 1
 		];
-		return $this->post->select($data)[0];
+		$post = $this->post->select($data)[0];
+		$post->publish_at = $this->formateDateTime($post->publish_at, 'DateTimePicker');
+		return $post;
 	}
 
 
 	public function editPost($id, $data){
-		return $this->post->update('posts', $data);
+		$data['publish_at'] = $this->formateDateTime($data['publish_at']);
+		$bindings = $this->post->getBindings($data);
+		$bindings[':id'] = $id;
+		return $this->post->update('posts', ['title', 'body', 'summery', 'status_id', 'publish_at'], 'WHERE id= :id LIMIT 1', $bindings);
 	}
 
 
 	public function deletePost($id){
 		return $this->post->deleteByID('posts', $id);
+	}
+
+	private function formateDateTime($date, $to='timestamp'){
+		$newDate = '';
+		if($to == 'timestamp'){
+			$dateFormater = DateTime::createFromFormat('m/d/Y g:i A', $date);
+			$newDate = $dateFormater->format('Y-m-d H:i:s');
+		}else{
+			$dateFormater = DateTime::createFromFormat('Y-m-d H:i:s', $date);
+			$newDate = $dateFormater->format('m/d/Y g:i A');
+		}
+		return $newDate;
+	}
+
+	private function formateArrayDates($dates){
+		for($i=0; $i<count($dates); $i++){
+			$dates[$i]->publish_at = $this->formateDateTime($dates[$i]->publish_at, 'DateTimePicker');
+		}
+		return $dates;
 	}
 }

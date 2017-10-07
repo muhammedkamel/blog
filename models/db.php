@@ -38,6 +38,10 @@ class DB {
 		
 		$query 	= "SELECT {$fields} FROM {$data['table']} {$data['where']} ";
 		
+		if(isset($data['sort'])){
+			$query = $query.' '.$data['sort'] .' ';
+		}
+
 		if(isset($data['offset'], $data['limit']) && ($data['offset'] >= 0) && ($data['limit'] > 0)){
 			$query .= "LIMIT {$data['limit']} OFFSET {$data['offset']}";
 		}elseif(isset($data['limit']) && $data['limit'] > 0){
@@ -93,7 +97,7 @@ class DB {
 
 
 
-	private function getBindings($data){
+	public function getBindings($data){
 		$bindings = [];
 		foreach ($data as $field => $value) {
 			$bindings[':'.$field] = $value;
@@ -106,7 +110,6 @@ class DB {
 		$query = "UPDATE {$table} " . $this->formatFields($fields) .' '. $conditions;
 		
 		// $bindings = $this->getBindings($data);
-
 		$stmt = $this->conn->prepare($query);
 
 		return $stmt->execute($bindings);
@@ -137,10 +140,10 @@ class DB {
 
 
 	private function formatFields($fields){
-		$query = '';
+		$query = 'SET ';
 
 		foreach($fields as $field){
-			$query .= 'SET '.$field.' = :'.$field.',';
+			$query .= $field.' = :'.$field.',';
 		}
 		return rtrim($query, ',');
 	}

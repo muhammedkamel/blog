@@ -41,12 +41,16 @@ class PostsView
 
 
     public function getPost($id){
-    	if($post = $this->postsController->getPostByID($id)){
-	        // get the post status
-	        // $post->status = $statuses[$post->status_id - 1]->status;
-	        $status_id = $post->status_id;
+    	if(($post = $this->postsController->getPostByID($id)) && ($statuses = $this->statusesController->getAllStatuses())){
+    		// formate the date to Datetime picker formate
+   //  		$date = DateTime::createFromFormat('Y-m-d H:i:s', $post->publish_at);
+			// $post->publish_at = $date->format('d/m/Y g:i A');
+    		
+    		$data['post'] 	  = $post;
+    		$data['statuses'] = $statuses;
+	        
 	        header('Content-Type: application/json');
-	        echo json_encode($post);
+	        echo json_encode($data);
 	        exit;
 	    }else{
 	        header('HTTP/1.1 503 Service Temporarily Unavailable');
