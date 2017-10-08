@@ -9,10 +9,19 @@ class PostsController {
 		$this->post = new Post;
 	}
 
-	public function paginatePosts($offset){
+	public function paginatePosts($offset, $control = false){
+		$condition = '';
+		$bindings  = [];
+		if($control === FALSE){
+			$condition = 'WHERE status_id= :status_id';
+			$bindings  = [':status_id' => ACTIVE];
+		}	
+		
 		$data = [
 			'table' 	=> 'posts',
 			'fields'	=> '*',
+			'where'		=> $condition,
+			'bindings'	=> $bindings,
 			'offset'	=> $offset,
 			'limit'		=> LIMIT
 		];
@@ -52,8 +61,8 @@ class PostsController {
 		$data = [
 			'table'		=> 'posts',
 			'fields'	=> '*',
-			'where'		=> 'WHERE id=:id',
-			'bindings'	=> [':id' => $id],
+			'where'		=> "WHERE id=:id AND status_id= :status_id",
+			'bindings'	=> [':id' => $id, 'status_id' => ACTIVE],
 			'limit'		=> 1
 		];
 		$post = $this->post->select($data)[0];
@@ -91,5 +100,17 @@ class PostsController {
 			$dates[$i]->publish_at = $this->formateDateTime($dates[$i]->publish_at, 'DateTimePicker');
 		}
 		return $dates;
+	}
+
+	public function search($key){
+		$data = [
+			'table'		=> 'posts',
+			'fields'	=> '*',
+			'where'		=> "WHERE ( title LIKE CONCAT('%', :title, '%') OR body LIKE CONCAT('%', :body, '%') ) AND status_id= :status_id",
+			'bindings'	=> [':title' => $key, ':body' => $key, ':status_id' => ACTIVE]
+		];
+		$posts = $this->post->select($data);
+		$this->formateArrayDates($posts);
+		return $posts;
 	}
 }

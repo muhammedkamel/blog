@@ -19,6 +19,10 @@ class PostsView
         $this->paginator 	= new Paginator;
     }
 
+    public function showPosts($offset = 0){
+        return $this->postsController->paginatePosts($offset);
+    }
+
     public function getPosts($offset = 0){
     	// offset starts with 0 then increases
 		return $this->postsController->paginatePostsWithStatus($offset);
@@ -82,4 +86,9 @@ class PostsView
     	return $this->paginator->paginate('posts', $page);
     }
 
+
+    public function search($key){
+        // @TODO filter key
+        return $this->postsController->search($key);
+    }
 }
