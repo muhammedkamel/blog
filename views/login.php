@@ -3,10 +3,11 @@ require_once __DIR__.'/../helpers/authenticate.php';
 require_once 'partials/header.php';
 require_once __DIR__.'/../controllers/ipscontroller.php';
 
-
+// check if the user is banned
 $ipsController = new IPsController;
 $ipsController->isBanned();
 
+// login
 $authenticate = new Authenticate;
 
 if(isset($_POST['username'], $_POST['password']) && !empty($_POST['username']) && !empty($_POST['password'])){

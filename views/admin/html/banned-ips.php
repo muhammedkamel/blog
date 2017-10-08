@@ -3,26 +3,29 @@
 require_once __DIR__.'/../../../controllers/ipscontroller.php';
 require_once __DIR__.'/../../../helpers/authenticate.php';
 
+// check if it's banned
 $ipsController = new IPsController;
 $ipsController->isBanned();
 
+// authenticate 
 $authenticate = new Authenticate;
 $authenticate->is_loggedin();
 
 $ips = [];
 
-if(isset($_POST['action'], $_POST['ip']) && $_POST['action'] == 'add' && !empty($_POST['ip'])){
+if(isset($_POST['action'], $_POST['ip']) && $_POST['action'] == 'add' && !empty($_POST['ip'])){ // ban ip
     $ipsController->banIP($_POST['ip']);
-}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'delete' && ($id = intval($_POST['id'])) > 0){
+}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'delete' && ($id = intval($_POST['id'])) > 0){ // allow ip
     $ipsController->allowIP($id);
-}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'get' && ($id = intval($_POST['id'])) > 0){
+}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'get' && ($id = intval($_POST['id'])) > 0){ // get ip 
     $ipsController->getIP($id);
 }elseif(isset($_POST['action'], $_POST['id'], $_POST['ip']) && $_POST['action'] == 'edit' 
-    && ($id = intval($_POST['id'])) > 0 && !empty($_POST['ip'])){
+    && ($id = intval($_POST['id'])) > 0 && !empty($_POST['ip'])){ // update ip
     $ipsController->editIP($id, $_POST['ip']);
 }
 
-if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
+// paginate
+if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){ 
     $pagination = $ipsController->paginate($page);
     // needs the offset from the paginator
     $ips      = $ipsController->paginateIPs($pagination['offset']);

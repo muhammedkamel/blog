@@ -3,27 +3,29 @@ require_once __DIR__.'/../../postsview.php';
 require_once __DIR__.'/../../../helpers/authenticate.php';
 require_once __DIR__.'/../../../controllers/ipscontroller.php';
 
-
+// check if the IP is banned
 $ipsController = new IPsController;
 $ipsController->isBanned();
 
+// authenticate the user
 $authenticate = new Authenticate;
 $authenticate->is_loggedin();
+
 
 $postsView  = new PostsView;
 
 // you need to check if the edit method changes it 
 $offset     = 0;
 
-if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data'])){
+if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data'])){ // add new post
     $postsView->addPost($_POST['data']);
-}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'get' && ($id = intval($_POST['id'])) > 0){
+}elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'get' && ($id = intval($_POST['id'])) > 0){ // get post to edit
     $postsView->getPost($id);
-}elseif(isset($_POST['action']) && $_POST['action'] == 'edit' && !empty($_POST['data']) && ($id=intval($_POST['id'])) > 0){
+}elseif(isset($_POST['action']) && $_POST['action'] == 'edit' && !empty($_POST['data']) && ($id=intval($_POST['id'])) > 0){ // update post
     $postsView->editPost($id, $_POST['data']);
-}elseif(isset($_POST['action']) && $_POST['action'] == 'delete' && ($id = intval($_POST['id'])) > 0){
+}elseif(isset($_POST['action']) && $_POST['action'] == 'delete' && ($id = intval($_POST['id'])) > 0){ // delete post
     $postsView->deletePost($id);
-}elseif(isset($_POST['action']) && $_POST['action'] == 'get_statuses'){
+}elseif(isset($_POST['action']) && $_POST['action'] == 'get_statuses'){ // get all statuses
     if($statuses = $postsView->getStatuses()){
         header('Content-Type: application/json');
         echo json_encode($statuses);
@@ -33,7 +35,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data']
     }
 }
 
-
+// paginate posts
 if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
     $pagination = $postsView->paginate($page);
     // needs the offset from the paginator

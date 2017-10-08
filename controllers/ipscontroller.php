@@ -13,6 +13,14 @@ class IPsController {
 		$this->paginator 	= new Paginator;
 	}
 
+	/**
+	 *
+	 * Method to get ips in the requested page
+	 * @param $offset int the starting row
+	 * @return $ips array of objects 
+	 *
+	 */
+	
 	public function paginateIPs($offset = 0){
 		$data = [
 			'table' 	=> 'banned_ips',
@@ -24,10 +32,27 @@ class IPsController {
 		return $this->ip->select($data);
 	}
 
+
+	/**
+	 *
+	 * Method to paginate the ips to pages 
+	 * @param $page int the page number the default is 1
+	 * @return array has the next, previous, and the offset
+	 *
+	 */
+	
 	public function paginate($page = 1){
 		return $this->paginator->paginate('banned_ips', $page);
 	}
 
+	/**
+	 *
+	 * Method to add a new ip to the banned-ips  this method responds only to the ajax requests
+	 * @param $ip string validated ip
+	 * 
+	 *
+	 */
+	
 	public function banIP($ip){
 		// @TODO check if it's ip and sanitize it
 		$data['ip'] 		= $ip;
@@ -40,6 +65,14 @@ class IPsController {
 	    }
 	}
 
+
+	/**
+	 *
+	 * Method to delete ip from the banned ips this method responds only to the ajax requests
+	 * @param $id int the id of the IP
+	 * 
+	 */
+	
 	public function allowIP($id){
 		if($this->ip->deleteByID('banned_ips', $id)){
 			echo json_encode(['success' => true]);
@@ -50,6 +83,14 @@ class IPsController {
 	}
 
 
+	/**
+	 *
+	 * Method to get an IP with it's id this method responds only to the ajax requests
+	 * @param $id int the IP id
+	 * 
+	 *
+	 */
+	
 	public function getIP($id){
 		$data = [
 			'table'		=> 'banned_ips',
@@ -59,7 +100,8 @@ class IPsController {
 			'limit'		=> 1
 		];
 
-		$ipInfo = $this->ip->select($data)[0];
+		$ipInfo = $this->ip->select($data);
+		if($ipInfo) $ipInfo = $ipInfo[0];
 
 		if($ipInfo){
 			header('Content-Type: application/json');
@@ -70,6 +112,14 @@ class IPsController {
 	    }
 	}
 
+	/**
+	 *
+	 * Method to update an ip this method responds only to the ajax requests
+	 * @param $id int the IP id
+	 * @param $ip string the new IP
+	 *
+	 */
+	
 	public function editIP($id, $ip){
 		// @TODO validate $data
 		if($this->ip->update('banned_ips', ['ip'],'WHERE id= :id LIMIT 1', [':id' => $id, ':ip' => $ip])){
@@ -83,6 +133,12 @@ class IPsController {
 
 
 	// it is better to write in an .htaccess file and ban it
+	/**
+	 *
+	 * Method to check if the accessed user is banned
+	 *
+	 */
+	
 	public function isBanned(){
 		$ip = $this->getRealIpAddr();
 		$data = [
@@ -101,6 +157,12 @@ class IPsController {
 		}
 	}
 
+	/**
+	 *
+	 * Method to get the real IP of the client
+	 * @return $ip string the IP
+	 */
+	
 	private function getRealIpAddr()
 	{
 	    if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet

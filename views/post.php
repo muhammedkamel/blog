@@ -1,11 +1,12 @@
 <?php 
 require_once 'partials/header.php';
 require_once __DIR__.'/../controllers/postscontroller.php';
+require_once __DIR__.'/postsview.php';
 
-$postsController = new PostsController;
+$postsView = new PostsView;
 
 if(isset($_GET['post']) && ($id = intval($_GET['post'])) > 0){
-	$post = $postsController->getPostByID($id);
+	$post = $postsView->showPost($id);
 }else{
     header('Location: posts.php');
 }
@@ -25,6 +26,8 @@ if(isset($_GET['post']) && ($id = intval($_GET['post'])) > 0){
 			<h1 class="text-center"><?= $post->title;?></h1>
 			<p class="body"><?= $post->body;?></p>
 		</div>
+	<?php else: ?> 
+		<?php header('Location: '.ROOT_URL.'/404.php'); ?>
 	<?php endif ?>
 </div>
 

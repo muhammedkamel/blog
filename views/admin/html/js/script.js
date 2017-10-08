@@ -2,7 +2,7 @@ $(function(){
 	
 	// delete post
 	$('#posts').on('click', '.delete', deletePost);
-
+	// show modal with the post to edit
 	$('#posts').on('click', '.edit', showEditPostForm);
 
 	// show add post modal

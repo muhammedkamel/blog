@@ -6,6 +6,15 @@ class Paginator extends DB {
 
 
 	// next, previous, offset
+	/**
+	 *
+	 * Method to set the pagination fields next, previous, and offset
+	 * @param $table string the table name to paginate
+	 * @param $page int the requested page
+	 * @return array with next, previous, offset
+	 *
+	 */
+	
 	public function paginate($table, $page = 1){
 		$data = [
 			'table' 	=> $table,
@@ -26,6 +35,14 @@ class Paginator extends DB {
 	}
 
 
+	/**
+	 *
+	 * Method to get the previous page number
+	 * @param $page int the page number
+	 * @return $page int the previous page number
+	 *
+	 */
+	
 	private function getPrevious($page){
 		if( ($page - 1) < 1 ){
 			return 1;
@@ -35,6 +52,15 @@ class Paginator extends DB {
 	}
 
 
+	/**
+	 *
+	 * Method to get the next page number
+	 * @param $page int the page number
+	 * @param $numOfRows in the number of all rows
+	 * @return $page int the next page number
+	 *
+	 */
+	
 	private function getNext($page, $numOfRows){
 		$numOfPages = ceil($numOfRows / LIMIT);
 		if( ($page + 1) >  $numOfPages){

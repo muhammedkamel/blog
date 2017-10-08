@@ -9,6 +9,15 @@ class PostsController {
 		$this->post = new Post;
 	}
 
+	/**
+	 *
+	 * Method to paginate the posts 
+	 * @param $offset int the starting row to select
+	 * @param $control boolean if false you must fetch the active posts only else fetch all to the dashboard
+	 * @return $posts array of objects
+	 *
+	 */
+	
 	public function paginatePosts($offset, $control = false){
 		$condition = '';
 		$bindings  = [];
@@ -30,7 +39,14 @@ class PostsController {
 		return $posts;
 	}
 
-
+	/**
+	 *
+	 * Method to paginate posts with the statuses JOIN
+	 * @param $offset the starting row
+	 * @return $posts array of objects
+	 *
+	 */
+	
 	public function paginatePostsWithStatus($offset){
 		$data = [
 			'table' 	=> 'posts AS P, statuses AS S',
@@ -47,6 +63,14 @@ class PostsController {
 	}
 
 
+	/**
+	 *
+	 * Method to add new post
+	 * @param $data array of the post content
+	 * @return boolean the query status
+	 *
+	 */
+	
 	public function addNewPost($data){
 		// @TODO validate data
 		// formate date to time stamp
@@ -56,7 +80,14 @@ class PostsController {
 		return $this->post->insertRecord('posts', $data);
 	}
 
-
+	/**
+	 *
+	 * Method to get the post with id
+	 * @param $id int the post ID
+	 * @param $status_id default 0 if it has value it will get the posts with status_id = value
+	 * @return $post object
+	 */
+	
 	public function getPostByID($id, $status_id = 0){
 		$where = "WHERE id=:id";
 		$bindings = [':id' => $id];
@@ -71,12 +102,26 @@ class PostsController {
 			'bindings'	=> $bindings,
 			'limit'		=> 1
 		];
-		$post = $this->post->select($data)[0];
-		$post->publish_at = $this->formateDateTime($post->publish_at, 'DateTimePicker');
+
+		$post = $this->post->select($data);
+		
+		if($post){
+			$post = $post[0];
+			$post->publish_at = $this->formateDateTime($post->publish_at, 'DateTimePicker');
+		}
+
 		return $post;
 	}
 
-
+	/**
+	 *
+	 * Method to edit post
+	 * @param $id int the post ID
+	 * @param $data array of the post content
+	 * @return boolean the query result
+	 *
+	 */
+	
 	public function editPost($id, $data){
 		$data['publish_at'] = $this->formateDateTime($data['publish_at']);
 		$bindings = $this->post->getBindings($data);
@@ -84,11 +129,27 @@ class PostsController {
 		return $this->post->update('posts', ['title', 'body', 'summery', 'status_id', 'publish_at'], 'WHERE id= :id LIMIT 1', $bindings);
 	}
 
-
+	/**
+	 *
+	 * Method to delete Post 
+	 * @param $id int the post ID
+	 * @return Boolean the query result
+	 *
+	 */
+	
 	public function deletePost($id){
 		return $this->post->deleteByID('posts', $id);
 	}
 
+	/**
+	 *
+	 * Method to formate the date and time from and to Timestamp, and DateTimePicker
+	 * @param $date string has the date 
+	 * @param $to the formate you want to format the date to
+	 * @return $newDate string with the formated date
+	 *
+	 */
+	
 	private function formateDateTime($date, $to='timestamp'){
 		$newDate = '';
 		if($to == 'timestamp'){
@@ -101,6 +162,14 @@ class PostsController {
 		return $newDate;
 	}
 
+	/**
+	 *
+	 * Method to Formate array of dates
+	 * @param $dates array has dates
+	 * @return $dates array with the dates formatted
+	 *
+	 */
+	
 	private function formateArrayDates($dates){
 		for($i=0; $i<count($dates); $i++){
 			$dates[$i]->publish_at = $this->formateDateTime($dates[$i]->publish_at, 'DateTimePicker');
@@ -108,6 +177,14 @@ class PostsController {
 		return $dates;
 	}
 
+	/**
+	 *
+	 * Method to search for post
+	 * @param $key string the search key
+	 * @return $posts array of objects
+	 *
+	 */
+	
 	public function search($key){
 		$data = [
 			'table'		=> 'posts',

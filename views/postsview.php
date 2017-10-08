@@ -19,20 +19,48 @@ class PostsView
         $this->paginator 	= new Paginator;
     }
 
+    /**
+     *
+     * Method to show the active posts in the home page
+     * @param $offset number the starting row default 0
+     * @return $posts array of objects 
+     *
+     */
+    
     public function showPosts($offset = 0){
         return $this->postsController->paginatePosts($offset);
     }
 
+    /**
+     *
+     * Method to get all posts to be shown in the dashboard
+     * @param $offset number the starting row default 0
+     * @return $posts array of objects 
+     */
+    
     public function getPosts($offset = 0){
     	// offset starts with 0 then increases
 		return $this->postsController->paginatePostsWithStatus($offset);
     }
 
-
+    /**
+     *
+     * Method to get all statuses
+     * @return array of objects with all statuses
+     *
+     */
+    
     public function getStatuses(){
     	return $this->statusesController->getAllStatuses();
     }
 
+    /**
+     *
+     * Method to add post responds to ajax request
+     * @param $data array the post data (title, summery, body, status, date)
+     * 
+     */
+    
     public function addPost($data){
     	// add post    
 	    if($this->postsController->addNewPost($data)){
@@ -43,29 +71,27 @@ class PostsView
 	    }
     }
 
-
+    /**
+     *
+     * Method to show "Active" post in the home page 
+     * @param $id int the id of the post
+     * 
+     *
+     */
+    
     public function showPost($id){
-        if(($post = $this->postsController->getPostByID($id, ACTIVE)) && ($statuses = $this->statusesController->getAllStatuses())){
-            // formate the date to Datetime picker formate
-   //       $date = DateTime::createFromFormat('Y-m-d H:i:s', $post->publish_at);
-            // $post->publish_at = $date->format('d/m/Y g:i A');
-            
-            $data['post']     = $post;
-            $data['statuses'] = $statuses;
-            
-            header('Content-Type: application/json');
-            echo json_encode($data);
-            exit;
-        }else{
-            header('HTTP/1.1 503 Service Temporarily Unavailable');
-        }
+        return $this->postsController->getPostByID($id, ACTIVE);
     }
 
+    /**
+     *
+     * Method to get post to the dashboard this method responds to ajax request
+     * @param $id int the post id
+     *
+     */
+    
     public function getPost($id){
     	if(($post = $this->postsController->getPostByID($id)) && ($statuses = $this->statusesController->getAllStatuses())){
-    		// formate the date to Datetime picker formate
-   //  		$date = DateTime::createFromFormat('Y-m-d H:i:s', $post->publish_at);
-			// $post->publish_at = $date->format('d/m/Y g:i A');
     		
     		$data['post'] 	  = $post;
     		$data['statuses'] = $statuses;
@@ -79,6 +105,14 @@ class PostsView
     }
 
 
+    /**
+     *
+     * Method to edit post responds to the ajax only
+     * @param $id int the post id
+     * @param $data array has the post data
+     *
+     */
+    
     public function editPost($id, $data){
     	if($this->postsController->editPost($id, $data)){
 	        echo json_encode(['success' => true]);
@@ -89,6 +123,14 @@ class PostsView
     }
 
 
+    /**
+     *
+     * Method to delete post responds to the ajax only
+     * @param $id int 
+     * 
+     *
+     */
+    
     public function deletePost($id){
     	if($this->postsController->deletePost($id)){
 	        echo json_encode(['success' => true]);
@@ -99,11 +141,25 @@ class PostsView
     }
 
 
+    /**
+     *
+     * Method to set the next and previous links correctly
+     * @param $page int the page number the default is 1
+     * @return array has the next, previous, and the offset
+     */
+    
     public function paginate($page = 1) {
     	return $this->paginator->paginate('posts', $page);
     }
 
 
+    /**
+     *
+     * Method to search for post in the title and body
+     * @param $key string
+     * @return array of objects
+     */
+    
     public function search($key){
         // @TODO filter key
         return $this->postsController->search($key);
