@@ -57,12 +57,18 @@ class PostsController {
 	}
 
 
-	public function getPostByID($id){
+	public function getPostByID($id, $status_id = 0){
+		$where = "WHERE id=:id";
+		$bindings = [':id' => $id];
+		if($status_id){
+			$where .= " AND status_id= :status_id";
+			$bindings[':status_id'] = $status_id;
+		}
 		$data = [
 			'table'		=> 'posts',
 			'fields'	=> '*',
-			'where'		=> "WHERE id=:id AND status_id= :status_id",
-			'bindings'	=> [':id' => $id, ':status_id' => ACTIVE],
+			'where'		=> $where,
+			'bindings'	=> $bindings,
 			'limit'		=> 1
 		];
 		$post = $this->post->select($data)[0];

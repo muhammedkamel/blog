@@ -1,25 +1,24 @@
 <?php 
 require_once __DIR__.'/../models/db.php';
-require_once('vendor/autoload.php');
+require_once __DIR__.'/../helpers/session.php';
+
 
 class Authenticate
 {
 	
     private $db;
-    private $session;
     
     public function __construct()
     {
         $this->db = new DB;
-        // Create a new gears session.
-		$session = new Gears\Session();
     }
+
+    
 
     public function login($username, $password){
     	// @TODO validate, and santize username, and password
     	if($id = intval($this->isUser($username, $password))){
-    		// Session::set('username', $username);
-    		$this->session->__set('username', $username);
+    		Session::put('username', $username);
     		header('Location: admin/html/posts.php');
     	}else{
     		require_once ROOT_DIR.'/translations.php';
@@ -29,9 +28,9 @@ class Authenticate
 
 
     public function is_loggedin(){
-    	if(!$this->session->__get('username', $username)){
-    		exit;
+    	if(!Session::has('username')){
     		header('Location: '.ROOT_URL.'views/login.php');
+            exit;
     	}
     }
 
@@ -52,7 +51,13 @@ class Authenticate
     }
 
     
+    public function logout(){
+        Session::flush();
+        header('Location: '.ROOT_URL.'views/login.php');
+    }
+
     private function encrypt($value){
     	return sha1(sha1($value).'@'.md5($value));
     }
+
 }

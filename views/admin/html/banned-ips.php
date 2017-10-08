@@ -1,9 +1,14 @@
 <?php
 
 require_once __DIR__.'/../../../controllers/ipscontroller.php';
-
+require_once __DIR__.'/../../../helpers/authenticate.php';
 
 $ipsController = new IPsController;
+$ipsController->isBanned();
+
+$authenticate = new Authenticate;
+$authenticate->is_loggedin();
+
 $ips = [];
 
 if(isset($_POST['action'], $_POST['ip']) && $_POST['action'] == 'add' && !empty($_POST['ip'])){
@@ -87,7 +92,7 @@ if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
                 </div>
                 <ul class="nav" id="side-menu">
                     <li style="padding: 70px 0 0;">
-                        <a href="index.php" class="waves-effect"><i class="fa fa-clock-o fa-fw" aria-hidden="true"></i>Dashboard</a>
+                        <a href="../../posts.php" class="waves-effect"><i class="fa fa-clock-o fa-fw" aria-hidden="true"></i>Home</a>
                     </li>
                     <li>
                         <a href="posts.php" class="waves-effect"><i class="fa fa-list-alt fa-fw" aria-hidden="true"></i>Posts</a>

@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__.'/../helpers/authenticate.php';
 require_once 'partials/header.php';
+require_once __DIR__.'/../controllers/ipscontroller.php';
+
+
+$ipsController = new IPsController;
+$ipsController->isBanned();
 
 $authenticate = new Authenticate;
 

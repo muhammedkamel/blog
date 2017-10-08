@@ -79,4 +79,42 @@ class IPsController {
 	        header('HTTP/1.1 503 Service Temporarily Unavailable');
 	    }
 	}
+
+
+
+	// it is better to write in an .htaccess file and ban it
+	public function isBanned(){
+		$ip = $this->getRealIpAddr();
+		$data = [
+			'table'		=> 'banned_ips',
+			'fields'	=> ['COUNT(1) AS count'],
+			'where'		=> 'WHERE ip=:ip',
+			'bindings'	=> [':ip' => $ip],
+			'limit'		=> 1
+		];
+
+		$ipInfo = $this->ip->select($data);
+
+		if(isset($ipInfo[0]) && $ipInfo[0]->count > 0){
+			header('Location: '.ROOT_URL.'401.php');
+			exit;
+		}
+	}
+
+	private function getRealIpAddr()
+	{
+	    if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
+	    {
+	      $ip=$_SERVER['HTTP_CLIENT_IP'];
+	    }
+	    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   //to check ip is pass from proxy
+	    {
+	      $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+	    }
+	    else
+	    {
+	      $ip=$_SERVER['REMOTE_ADDR'];
+	    }
+	    return $ip;
+	}
 }
