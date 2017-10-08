@@ -1,5 +1,9 @@
 <?php 
 require_once __DIR__.'/../../postsview.php';
+require_once __DIR__.'/../../../helpers/authenticate.php';
+
+$authenticate = new Authenticate;
+$authenticate->is_loggedin();
 
 $postsView  = new PostsView;
 
@@ -78,14 +82,7 @@ if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
 </head>
 
 <body class="fix-header">
-    <!-- ============================================================== -->
-    <!-- Preloader -->
-    <!-- ============================================================== -->
-    <div class="preloader">
-        <svg class="circular" viewBox="25 25 50 50">
-            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
-        </svg>
-    </div>
+   
     <!-- ============================================================== -->
     <!-- Wrapper -->
     <!-- ============================================================== -->
@@ -101,7 +98,7 @@ if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
         <div class="navbar-default sidebar" role="navigation">
             <div class="sidebar-nav slimscrollsidebar">
                 <div class="sidebar-head">
-                    <h3><span class="fa-fw open-close"><i class="ti-close ti-menu"></i></span> <span class="hide-menu">Blog Dashboard</span></h3>
+                    <a href="logout.php" class="btn btn-primary btn-block">Logout <span class="glyphicon glyphicon-off"></span></a>
                 </div>
                 <ul class="nav" id="side-menu">
                     <li style="padding: 70px 0 0;">
@@ -127,8 +124,8 @@ if(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
         <!-- Page Content -->
         <!-- ============================================================== -->
         <div id="page-wrapper">
+                
             <div class="container-fluid">
-
                 <div class="row">
                     <button class="btn btn-info btn-block" id="add">Add new Post <i class="glyphicon glyphicon-plus-sign"></i></button>
                     <div class="table-responsive">

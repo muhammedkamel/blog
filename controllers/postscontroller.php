@@ -62,7 +62,7 @@ class PostsController {
 			'table'		=> 'posts',
 			'fields'	=> '*',
 			'where'		=> "WHERE id=:id AND status_id= :status_id",
-			'bindings'	=> [':id' => $id, 'status_id' => ACTIVE],
+			'bindings'	=> [':id' => $id, ':status_id' => ACTIVE],
 			'limit'		=> 1
 		];
 		$post = $this->post->select($data)[0];

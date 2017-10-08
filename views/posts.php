@@ -1,12 +1,13 @@
 <?php 
 require_once __DIR__.'/postsview.php';
+require_once __DIR__.'/../translations.php';
 require_once 'partials/header.php';
 
 $postsView  = new PostsView;
 
 if(isset($_GET['search']) && !empty($_GET['search'])){
 	$posts = $postsView->search($_GET['search']);
-}elseif(isset($_GET['page']) && ($page = intval($_GET['page'])) >= 0){
+}elseif(isset($_GET['page']) && ($page = intval($_GET['page'])) > 0){
     $pagination = $postsView->paginate($page);
     // needs the offset from the paginator
     $posts      = $postsView->showPosts($pagination['offset']);
@@ -48,7 +49,7 @@ if(isset($_GET['search']) && !empty($_GET['search'])){
 			<p style="font-size: 2em;">
 			<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 			<span class="sr-only">Error:</span>
-			There is no posts with this search key</p>
+			<?= $translate['en']['no_result']; ?></p>
 		</div>
 	<?php endif?>
 	

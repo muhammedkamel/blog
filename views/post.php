@@ -4,7 +4,7 @@ require_once __DIR__.'/../controllers/postscontroller.php';
 
 $postsController = new PostsController;
 
-if(isset($_GET['post']) && ($id = intval($_GET['post'])) >= 0){
+if(isset($_GET['post']) && ($id = intval($_GET['post'])) > 0){
 	$post = $postsController->getPostByID($id);
 }else{
     header('Location: posts.php');
