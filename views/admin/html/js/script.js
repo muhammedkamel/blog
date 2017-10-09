@@ -254,8 +254,8 @@ function showAddPostForm(){
         url:    'posts.php',
         method: 'POST',
         data:   {action: 'get_statuses'}
-    }).done(function(data){
-        data.statuses = data;
+    }).done(function(results){
+        data.statuses = results;
         body = makePostForm(data);
         data = {
             id: 'add-post',

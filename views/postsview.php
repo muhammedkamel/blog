@@ -148,8 +148,8 @@ class PostsView
      * @return array has the next, previous, and the offset
      */
     
-    public function paginate($page = 1) {
-    	return $this->paginator->paginate('posts', $page);
+    public function paginate($page = 1, $condition = '', $bindings = []) {
+    	return $this->paginator->paginate('posts', $page, $condition, $bindings);
     }
 
 

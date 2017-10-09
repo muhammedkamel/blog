@@ -15,10 +15,12 @@ class Paginator extends DB {
 	 *
 	 */
 	
-	public function paginate($table, $page = 1){
+	public function paginate($table, $page = 1, $condition = '', $bindings = []){
 		$data = [
 			'table' 	=> $table,
 			'fields'	=> ['COUNT(1) AS count'],
+			'where'		=> $condition,
+			'bindings'	=> $bindings,
 			'limit'		=> 1
 		];
 
