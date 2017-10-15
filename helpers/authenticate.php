@@ -1,7 +1,7 @@
 <?php 
 require_once __DIR__.'/../models/db.php';
 require_once __DIR__.'/../helpers/session.php';
-
+require_once __DIR__ . '/../helpers/xxs-filter.php';
 
 class Authenticate
 {
@@ -14,9 +14,19 @@ class Authenticate
     }
 
     
-
-    public function login($username, $password){
+    /**
+     *
+     * Method to login the admin
+     * @param $username string 
+     * @param $password string 
+     *
+     */
+    
+    public function login(string $username, string $password){
     	// @TODO validate, and santize username, and password
+        $username = XSSFilter::globalXssClean($username);
+        $password = XSSFilter::globalXssClean($password);
+        
     	if($id = intval($this->isUser($username, $password))){
     		Session::put('username', $username);
     		header('Location: admin/html/posts.php');
@@ -26,7 +36,11 @@ class Authenticate
     	}
     }
 
-
+    /**
+     *
+     * Method to check if the user logged in using session
+     *
+     */
     public function is_loggedin(){
     	if(!Session::has('username')){
     		header('Location: '.ROOT_URL.'views/login.php');
@@ -34,6 +48,15 @@ class Authenticate
     	}
     }
 
+    /**
+     *
+     * Method to check if the credentials is already exists
+     * @param $username string 
+     * @param $password string 
+     * @return $id or 0 in order to the user existance
+     *
+     */
+    
     private function isUser($username, $password){
     	$password = $this->encrypt($password);
     	$data = [
@@ -50,12 +73,23 @@ class Authenticate
 		return 0;
     }
 
-    
+    /**
+     *
+     * Method to logout destroy session
+     *
+     */
     public function logout(){
         Session::flush();
         header('Location: '.ROOT_URL.'views/login.php');
     }
 
+    /**
+     *
+     * Method to encrypt string 
+     * @param $value string 
+     * @return $value encrypted string
+     *
+     */
     private function encrypt($value){
     	return sha1(sha1($value).'@'.md5($value));
     }

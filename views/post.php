@@ -23,7 +23,7 @@ if(isset($_GET['post']) && ($id = intval($_GET['post'])) > 0){
 <div class="container col-xs-8 col-xs-offset-2">
 
 	<div class="col-xs-12" style="margin-top: 1em;">
-	    <a href="login.php" class="btn btn-primary col-xs-3">Login <span class="glyphicon glyphicon-off"></span></a>
+	    <a href="admin/html/posts.php" class="btn btn-primary col-xs-3">Login <span class="glyphicon glyphicon-off"></span></a>
 	    
 		<form class="navbar-form col-xs-5 col-xs-offset-4" role="search" action="posts.php" method="GET">
 			<div class="input-group add-on">

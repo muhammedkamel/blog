@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../models/ip.php';
 require_once __DIR__.'/../models/paginator.php';
+require_once __DIR__ . '/../helpers/xxs-filter.php';
 
 class IPsController {
 
@@ -21,7 +22,8 @@ class IPsController {
 	 *
 	 */
 	
-	public function paginateIPs($offset = 0){
+	public function paginateIPs(int $offset = 0){
+		$offset = XSSFilter::globalXssClean($offset);
 		$data = [
 			'table' 	=> 'banned_ips',
 			'fields'	=> '*',
@@ -41,7 +43,8 @@ class IPsController {
 	 *
 	 */
 	
-	public function paginate($page = 1){
+	public function paginate(int $page = 1){
+		$page = XSSFilter::globalXssClean($page);
 		return $this->paginator->paginate('banned_ips', $page);
 	}
 
@@ -53,8 +56,9 @@ class IPsController {
 	 *
 	 */
 	
-	public function banIP($ip){
+	public function banIP(string $ip){
 		// @TODO check if it's ip and sanitize it
+		$ip = XSSFilter::globalXssClean($ip);
 		$data['ip'] 		= $ip;
 		$data['admin_id'] 	= 1;
 		if($this->ip->insertRecord('banned_ips', $data)){
@@ -73,7 +77,8 @@ class IPsController {
 	 * 
 	 */
 	
-	public function allowIP($id){
+	public function allowIP(int $id){
+		$id = XSSFilter::globalXssClean($id);
 		if($this->ip->deleteByID('banned_ips', $id)){
 			echo json_encode(['success' => true]);
 	        exit;
@@ -91,7 +96,8 @@ class IPsController {
 	 *
 	 */
 	
-	public function getIP($id){
+	public function getIP(int $id){
+		$id = XSSFilter::globalXssClean($id);
 		$data = [
 			'table'		=> 'banned_ips',
 			'fields'	=> '*',
@@ -120,7 +126,9 @@ class IPsController {
 	 *
 	 */
 	
-	public function editIP($id, $ip){
+	public function editIP(int $id, string $ip){
+		$id = XSSFilter::globalXssClean($id);
+		$ip = XSSFilter::globalXssClean($ip);
 		// @TODO validate $data
 		if($this->ip->update('banned_ips', ['ip'],'WHERE id= :id LIMIT 1', [':id' => $id, ':ip' => $ip])){
 			echo json_encode(['success' => true]);

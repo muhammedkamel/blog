@@ -11,11 +11,12 @@ class Paginator extends DB {
 	 * Method to set the pagination fields next, previous, and offset
 	 * @param $table string the table name to paginate
 	 * @param $page int the requested page
+	 * @param $condition string 
+	 * @param $bindings array
 	 * @return array with next, previous, offset
 	 *
 	 */
-	
-	public function paginate($table, $page = 1, $condition = '', $bindings = []){
+	public function paginate(string $table, int $page = 1, string $condition = '', array $bindings = []){
 		$data = [
 			'table' 	=> $table,
 			'fields'	=> ['COUNT(1) AS count'],

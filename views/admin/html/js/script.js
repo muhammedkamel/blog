@@ -255,6 +255,7 @@ function showAddPostForm(){
         method: 'POST',
         data:   {action: 'get_statuses'}
     }).done(function(results){
+    	var data = [];
         data.statuses = results;
         body = makePostForm(data);
         data = {

@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../models/post.php';
+require_once __DIR__ . '/../helpers/xxs-filter.php';
 
 class PostsController {
 	public $post;
@@ -18,7 +19,7 @@ class PostsController {
 	 *
 	 */
 	
-	public function paginatePosts($offset, $control = false){
+	public function paginatePosts(int $offset, bool $control = false){
 		$condition = '';
 		$bindings  = [];
 		if($control === FALSE){
@@ -47,7 +48,7 @@ class PostsController {
 	 *
 	 */
 	
-	public function paginatePostsWithStatus($offset){
+	public function paginatePostsWithStatus(int $offset){
 		$data = [
 			'table' 	=> 'posts AS P, statuses AS S',
 			'fields'	=> ['P.id', 'P.title', 'P.summery', 'P.body', 'P.publish_at', 'S.status'],
@@ -71,14 +72,16 @@ class PostsController {
 	 *
 	 */
 	
-	public function addNewPost($data){
+	public function addNewPost(array $data){
 		// @TODO validate data
+		$data = XSSFilter::globalXssClean($data);
 		// formate date to time stamp
 		$data['publish_at'] = $this->formateDateTime($data['publish_at']);
 		// this value will be retrieved from the session
 		$data['admin_id']	= 1;
 		return $this->post->insertRecord('posts', $data);
 	}
+
 
 	/**
 	 *
@@ -88,7 +91,9 @@ class PostsController {
 	 * @return $post object
 	 */
 	
-	public function getPostByID($id, $status_id = 0){
+	public function getPostByID(int $id, int $status_id = 0){
+		$id = XSSFilter::globalXssClean($id);
+		$status_id = XSSFilter::globalXssClean($status_id);
 		$where = "WHERE id=:id";
 		$bindings = [':id' => $id];
 		if($status_id){
@@ -122,7 +127,9 @@ class PostsController {
 	 *
 	 */
 	
-	public function editPost($id, $data){
+	public function editPost(int $id, array $data){
+		$data = XSSFilter::globalXssClean($data);
+		$id   = XSSFilter::globalXssClean($id);
 		$data['publish_at'] = $this->formateDateTime($data['publish_at']);
 		$bindings = $this->post->getBindings($data);
 		$bindings[':id'] = $id;
@@ -137,7 +144,8 @@ class PostsController {
 	 *
 	 */
 	
-	public function deletePost($id){
+	public function deletePost(int $id){
+		$id = XSSFilter::globalXssClean($id);
 		return $this->post->deleteByID('posts', $id);
 	}
 
@@ -150,7 +158,7 @@ class PostsController {
 	 *
 	 */
 	
-	private function formateDateTime($date, $to='timestamp'){
+	private function formateDateTime(string $date, string $to='timestamp'){
 		$newDate = '';
 		if($to == 'timestamp'){
 			$dateFormater = DateTime::createFromFormat('m/d/Y g:i A', $date);
@@ -170,7 +178,7 @@ class PostsController {
 	 *
 	 */
 	
-	private function formateArrayDates($dates){
+	private function formateArrayDates(array $dates){
 		for($i=0; $i<count($dates); $i++){
 			$dates[$i]->publish_at = $this->formateDateTime($dates[$i]->publish_at, 'DateTimePicker');
 		}
@@ -185,7 +193,8 @@ class PostsController {
 	 *
 	 */
 	
-	public function search($key){
+	public function search(string $key){
+		$key = XSSFilter::globalXssClean($key);
 		$data = [
 			'table'		=> 'posts',
 			'fields'	=> '*',
