@@ -24,34 +24,22 @@ if(isset($_GET['search']) && !empty($_GET['search'])){
 
 ?>
 
-<style>
-	.summery{
-		font-size: 1.3em;
-	}
-</style>
 
-<div class="container col-xs-8 col-xs-offset-2">
-	<div class="col-xs-12" style="margin-top: 1em;">
-	    <a href="admin/html/posts.php" class="btn btn-primary col-xs-3">Login <span class="glyphicon glyphicon-off"></span></a>
-	    
-		<form class="navbar-form col-xs-5 col-xs-offset-4" role="search" action="posts.php" method="GET">
-			<div class="input-group add-on">
-			  <input class="form-control" placeholder="Search" name="search" id="srch-term" type="text" value="<?php if(isset($_GET['search'])) echo $_GET['search'];?>">
-			  	<div class="input-group-btn">
-			    	<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-				</div>
-			</div>
-		</form>
-	</div>
-	<hr>
+	<hr style="margin-bottom: 5em; ">
 	<?php if($posts):
 	  foreach ($posts as $post) :?>
 		<div class="row">
-			<h1 class="text-center"><?= $post->title;?></h1>
-			<hr>
-			<p class="summery"><?= $post->summery;?>
-			 ... <a class="btn btn-info" href="post.php?post=<?= $post->id ?>" target="_blank">Read More</a>
-			</p>
+		  	<div class="panel panel-default">
+			  <div class="panel-heading">
+			    <h3 class="panel-title"><?= $post->title;?></h3>
+			  </div>
+			  <div class="panel-body">
+			    <p class="summery"><?= $post->summery;?></p>
+			  </div>
+			  <div class="panel-footer">
+			  	<a class="btn btn-info" href="post.php?post=<?= $post->id ?>" target="_blank">Read More</a>
+			  </div>
+			</div>
 		</div>
 	<?php endforeach ?>
 	<?php else:?>
@@ -71,6 +59,6 @@ if(isset($_GET['search']) && !empty($_GET['search'])){
 	      </ul>
 	    </nav>
 	<?php endif?>
-</div>
+
 
 <?php require_once 'partials/footer.php';?>
