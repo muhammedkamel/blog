@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__.'/../helpers/authenticate.php';
-require_once 'partials/header.php';
 require_once __DIR__.'/../controllers/ipscontroller.php';
 
 // check if the user is banned
@@ -15,7 +14,14 @@ if(isset($_POST['username'], $_POST['password']) && !empty($_POST['username']) &
 }
 
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Login</title>
+	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+</head>
+<body>
 <div class="container col-xs-6 col-xs-offset-3">
 	<h1 style="text-align: center;">Please Sign in</h1>
 	<form action="login.php" method="POST">
@@ -38,7 +44,5 @@ if(isset($_POST['username'], $_POST['password']) && !empty($_POST['username']) &
 			</div>
 		<?php endif?>
 	</form>
-
-</div>
 
 <?php require_once 'partials/footer.php';?>

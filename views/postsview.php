@@ -91,11 +91,11 @@ class PostsView
      */
     
     public function getPost($id){
-    	if(($post = $this->postsController->getPostByID($id)) && ($statuses = $this->statusesController->getAllStatuses())){
-    		
-    		$data['post'] 	  = $post;
+		if(($post = $this->postsController->getPostByID($id)) && ($statuses = $this->statusesController->getAllStatuses())){	
+			$data = [];
+    		$data['post'] 	  = (array)$post;
     		$data['statuses'] = $statuses;
-	        
+			
 	        header('Content-Type: application/json');
 	        echo json_encode($data);
 	        exit;

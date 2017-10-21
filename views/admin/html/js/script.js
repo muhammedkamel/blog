@@ -226,14 +226,16 @@ function showEditIPForm(){
 }
 
 
-function showEditPostForm(){            
+function showEditPostForm(){   
     var id   = $(this).parent().children('input[name="id"]').val();
     var body = '';
     $.ajax({
         url:    'posts.php',
         method: 'POST',
+		datatype: 'json',
         data:   {action: 'get', id: id}
     }).done(function(data){
+		console.log('hamada');
         body = makePostForm(data);
         data = {
             id: 'edit-post',
@@ -272,6 +274,7 @@ function showAddPostForm(){
 
 
 function makePostForm(data){
+	console.log(data);
     var id          = '',
         title       = '',
         body        = '',
@@ -290,19 +293,19 @@ function makePostForm(data){
 
     return id+'<div class="form-group">\
             <label for="title" class="control-label">Title</label>\
-            <input type="text" name="title" id="title" class="form-control" placeholder="Title" value="'+title+'">\
+            <input type="text" name="title" id="title" required class="form-control" placeholder="Title" value="'+title+'">\
         </div>\
         <div class="form-group">\
             <label for="body" class="control-label">Body</label>\
-            <textarea name="body" id="body" cols="30" rows="10" class="form-control" placeholder="Body here">'+body+'</textarea>\
+            <textarea name="body" id="body" required cols="30" rows="10" class="form-control" placeholder="Body here">'+body+'</textarea>\
         </div>\
         <div class="form-group">\
             <label for="summery" class="control-label">Summery</label>\
-            <textarea name="summery" id="summery" cols="30" rows="5" class="form-control" placeholder="summery here">'+summery+'</textarea>\
+            <textarea name="summery" id="summery" required cols="30" rows="5" class="form-control" placeholder="summery here">'+summery+'</textarea>\
         </div>\
         <div class="form-group">\
             <label for="status" class="control-label">Status</label>\
-            <select id="status" name="status">'+ makeStatusesList(data.statuses, status_id) +
+            <select id="status" name="status" required >'+ makeStatusesList(data.statuses, status_id) +
             '</select>\
         </div>\
         <div class="container">\
@@ -310,7 +313,7 @@ function makePostForm(data){
                 <div class="col-sm-6">\
                     <div class="form-group">\
                         <div class="input-group date" id="publish-date">\
-                            <input type="text" class="form-control" id="date" value="'+publish_at+'"/>\
+                            <input type="text" required class="form-control" id="date" value="'+publish_at+'"/>\
                             <span class="input-group-addon">\
                             <span class="glyphicon glyphicon-calendar"></span>\
                             </span>\

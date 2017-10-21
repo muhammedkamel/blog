@@ -42,15 +42,6 @@ if(isset($_GET['search']) && !empty($_GET['search'])){
 			</div>
 		</div>
 	<?php endforeach ?>
-	<?php else:?>
-		<div class="alert alert-danger" role="alert">
-			<p style="font-size: 2em;">
-			<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-			<span class="sr-only">Error:</span>
-			<?= $translate['en']['no_result']; ?></p>
-		</div>
-	<?php endif?>
-	
 	<?php if(isset($pagination)): ?>
 		<nav aria-label="pagination">
 	      <ul class="pager">
@@ -59,6 +50,13 @@ if(isset($_GET['search']) && !empty($_GET['search'])){
 	      </ul>
 	    </nav>
 	<?php endif?>
-
+	<?php else:?>
+		<div class="alert alert-danger" role="alert">
+			<p style="font-size: 2em;">
+			<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+			<span class="sr-only">Error:</span>
+			<?= $translate['en']['no_result']; ?></p>
+		</div>
+	<?php endif?>
 
 <?php require_once 'partials/footer.php';?>

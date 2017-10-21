@@ -5,35 +5,35 @@ require_once __DIR__ . '/../helpers/xxs-filter.php';
 
 class PostsController {
 	public $post;
-	
+
 	public function __construct() {
 		$this->post = new Post;
 	}
 
 	/**
 	 *
-	 * Method to paginate the posts 
+	 * Method to paginate the posts
 	 * @param $offset int the starting row to select
 	 * @param $control boolean if false you must fetch the active posts only else fetch all to the dashboard
 	 * @return $posts array of objects
 	 *
 	 */
-	
-	public function paginatePosts(int $offset, bool $control = false){
+
+	public function paginatePosts(int $offset, bool $control = false) {
 		$condition = '';
-		$bindings  = [];
-		if($control === FALSE){
+		$bindings = [];
+		if ($control === FALSE) {
 			$condition = 'WHERE status_id= :status_id';
-			$bindings  = [':status_id' => ACTIVE];
-		}	
-		
+			$bindings = [':status_id' => ACTIVE];
+		}
+
 		$data = [
-			'table' 	=> 'posts',
-			'fields'	=> '*',
-			'where'		=> $condition,
-			'bindings'	=> $bindings,
-			'offset'	=> $offset,
-			'limit'		=> LIMIT
+			'table' => 'posts',
+			'fields' => '*',
+			'where' => $condition,
+			'bindings' => $bindings,
+			'offset' => $offset,
+			'limit' => LIMIT,
 		];
 
 		$posts = $this->formateArrayDates($this->post->select($data));
@@ -47,22 +47,21 @@ class PostsController {
 	 * @return $posts array of objects
 	 *
 	 */
-	
-	public function paginatePostsWithStatus(int $offset){
+
+	public function paginatePostsWithStatus(int $offset) {
 		$data = [
-			'table' 	=> 'posts AS P, statuses AS S',
-			'fields'	=> ['P.id', 'P.title', 'P.summery', 'P.body', 'P.publish_at', 'S.status'],
-			'where'		=> 'WHERE P.status_id = S.id',
-			'bindings'	=> [],
-			'offset'	=> $offset,
-			'limit'		=> LIMIT,
-			'sort'		=> 'ORDER BY P.publish_at DESC'
+			'table' => 'posts AS P, statuses AS S',
+			'fields' => ['P.id', 'P.title', 'P.summery', 'P.body', 'P.publish_at', 'S.status'],
+			'where' => 'WHERE P.status_id = S.id',
+			'bindings' => [],
+			'offset' => $offset,
+			'limit' => LIMIT,
+			'sort' => 'ORDER BY P.publish_at DESC',
 		];
 
 		$posts = $this->formateArrayDates($this->post->select($data));
-		return $posts;	
+		return $posts;
 	}
-
 
 	/**
 	 *
@@ -71,17 +70,16 @@ class PostsController {
 	 * @return boolean the query status
 	 *
 	 */
-	
-	public function addNewPost(array $data){
+
+	public function addNewPost(array $data) {
 		// @TODO validate data
 		$data = XSSFilter::globalXssClean($data);
 		// formate date to time stamp
 		$data['publish_at'] = $this->formateDateTime($data['publish_at']);
 		// this value will be retrieved from the session
-		$data['admin_id']	= 1;
+		$data['admin_id'] = 1;
 		return $this->post->insertRecord('posts', $data);
 	}
-
 
 	/**
 	 *
@@ -90,32 +88,15 @@ class PostsController {
 	 * @param $status_id default 0 if it has value it will get the posts with status_id = value
 	 * @return $post object
 	 */
-	
-	public function getPostByID(int $id, int $status_id = 0){
+	// TODO htmlentities to strings
+	public function getPostByID(int $id, int $status_id = 0) {
 		$id = XSSFilter::globalXssClean($id);
 		$status_id = XSSFilter::globalXssClean($status_id);
-		$where = "WHERE id=:id";
-		$bindings = [':id' => $id];
-		if($status_id){
-			$where .= " AND status_id= :status_id";
-			$bindings[':status_id'] = $status_id;
+		if ($status_id) {
+			// getPostWithStatus
+		} else {
+			// getPost
 		}
-		$data = [
-			'table'		=> 'posts',
-			'fields'	=> '*',
-			'where'		=> $where,
-			'bindings'	=> $bindings,
-			'limit'		=> 1
-		];
-
-		$post = $this->post->select($data);
-		
-		if($post){
-			$post = $post[0];
-			$post->publish_at = $this->formateDateTime($post->publish_at, 'DateTimePicker');
-		}
-
-		return $post;
 	}
 
 	/**
@@ -126,10 +107,10 @@ class PostsController {
 	 * @return boolean the query result
 	 *
 	 */
-	
-	public function editPost(int $id, array $data){
+
+	public function editPost(int $id, array $data) {
 		$data = XSSFilter::globalXssClean($data);
-		$id   = XSSFilter::globalXssClean($id);
+		$id = XSSFilter::globalXssClean($id);
 		$data['publish_at'] = $this->formateDateTime($data['publish_at']);
 		$bindings = $this->post->getBindings($data);
 		$bindings[':id'] = $id;
@@ -138,13 +119,13 @@ class PostsController {
 
 	/**
 	 *
-	 * Method to delete Post 
+	 * Method to delete Post
 	 * @param $id int the post ID
 	 * @return Boolean the query result
 	 *
 	 */
-	
-	public function deletePost(int $id){
+
+	public function deletePost(int $id) {
 		$id = XSSFilter::globalXssClean($id);
 		return $this->post->deleteByID('posts', $id);
 	}
@@ -152,18 +133,18 @@ class PostsController {
 	/**
 	 *
 	 * Method to formate the date and time from and to Timestamp, and DateTimePicker
-	 * @param $date string has the date 
+	 * @param $date string has the date
 	 * @param $to the formate you want to format the date to
 	 * @return $newDate string with the formated date
 	 *
 	 */
-	
-	private function formateDateTime(string $date, string $to='timestamp'){
+
+	private function formateDateTime(string $date, string $to = 'timestamp') {
 		$newDate = '';
-		if($to == 'timestamp'){
+		if ($to == 'timestamp') {
 			$dateFormater = DateTime::createFromFormat('m/d/Y g:i A', $date);
 			$newDate = $dateFormater->format('Y-m-d H:i:s');
-		}else{
+		} else {
 			$dateFormater = DateTime::createFromFormat('Y-m-d H:i:s', $date);
 			$newDate = $dateFormater->format('m/d/Y g:i A');
 		}
@@ -177,9 +158,9 @@ class PostsController {
 	 * @return $dates array with the dates formatted
 	 *
 	 */
-	
-	private function formateArrayDates(array $dates){
-		for($i=0; $i<count($dates); $i++){
+
+	private function formateArrayDates(array $dates) {
+		for ($i = 0; $i < count($dates); $i++) {
 			$dates[$i]->publish_at = $this->formateDateTime($dates[$i]->publish_at, 'DateTimePicker');
 		}
 		return $dates;
@@ -192,14 +173,14 @@ class PostsController {
 	 * @return $posts array of objects
 	 *
 	 */
-	
-	public function search(string $key){
+
+	public function search(string $key) {
 		$key = XSSFilter::globalXssClean($key);
 		$data = [
-			'table'		=> 'posts',
-			'fields'	=> '*',
-			'where'		=> "WHERE ( title LIKE CONCAT('%', :title, '%') OR body LIKE CONCAT('%', :body, '%') ) AND status_id= :status_id",
-			'bindings'	=> [':title' => $key, ':body' => $key, ':status_id' => ACTIVE]
+			'table' => 'posts',
+			'fields' => '*',
+			'where' => "WHERE ( title LIKE CONCAT('%', :title, '%') OR body LIKE CONCAT('%', :body, '%') ) AND status_id= :status_id",
+			'bindings' => [':title' => $key, ':body' => $key, ':status_id' => ACTIVE],
 		];
 		$posts = $this->post->select($data);
 		$this->formateArrayDates($posts);

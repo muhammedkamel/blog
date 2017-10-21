@@ -17,6 +17,7 @@ $postsView  = new PostsView;
 // you need to check if the edit method changes it 
 $offset     = 0;
 
+
 if(isset($_POST['action']) && $_POST['action'] == 'add' && !empty($_POST['data'])){ // add new post
     $postsView->addPost($_POST['data']);
 }elseif(isset($_POST['action'], $_POST['id']) && $_POST['action'] == 'get' && ($id = intval($_POST['id'])) > 0){ // get post to edit
