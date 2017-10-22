@@ -3,16 +3,19 @@ namespace Blog\Repositories;
 
 interface IPostRepository {
 
-	public function addPost(string $title, string $body, string $summery, int $status, string $publish_at, int $admin_id): bool;
+	public function addPost(array $data): bool;
 
-	public function editPost(int $id, string $title, string $body, string $summery, int $status, string $publish_at, int $admin_id): bool;
+	public function editPost(int $id, array $data): bool;
 
 	public function deletePost(int $id): bool;
 
 	public function getPost(int $id);
 
-	public function getPostWithStatus(int $id);
+	public function getPostWhenStatus(int $id, int $status_id);
 
-	public function getPosts($offset);
+	public function getPosts(int $offset);
 
+	public function getPostsWhenStatus(int $offset, int $status_id);
+
+	public function search(string $key);
 }

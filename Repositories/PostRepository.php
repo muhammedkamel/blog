@@ -1,10 +1,11 @@
 <?php
+namespace Blog\Repositories;
 
 require_once __DIR__ . '/IPostRepository.php';
 require_once __DIR__ . '/../Libs/DB.php';
 
-use DOTW\Libs\DB as DB;
-use DOTW\Repositories\IPostRepository;
+use Blog\Libs\DB as DB;
+use Blog\Repositories\IPostRepository;
 
 class PostRepository implements IPostRepository {
 
@@ -27,9 +28,6 @@ class PostRepository implements IPostRepository {
 	 *
 	 */
 	public function addPost(array $data): bool{
-		if(!isset($data['admin_id']) || empty($data['admin_id'])){
-			$data['admin_id'] = 1;
-		}
 		if($this->isValid($data)){
 			return $this->db->insertRecord('posts', $data);
 		}
@@ -51,6 +49,16 @@ class PostRepository implements IPostRepository {
 			return $this->db->update('posts', ['title', 'body', 'summery', 'status_id', 'publish_at'], 'WHERE id= :id LIMIT 1', $bindings);
 		}
 		return false;
+	}
+
+
+	/**
+	 *
+	 * check that all fields has values
+	 *
+	 */
+	private function isValid($data){
+		return ($data['title'] && $data['body'] && $data['summery'] && $data['status_id'] && $data['publish_at']);
 	}
 
 	/**
@@ -83,14 +91,7 @@ class PostRepository implements IPostRepository {
 			'limit'		=> 1
 		];
 
-		$post = $this->db->select($data);
-
-		if(count($post) > 0){
-			$post = $post[0];
-			$post->publish_at = $this->formateDateTime($post->publish_at, 'DateTimePicker');
-		}
-		
-		return $post;
+		return $this->db->select($data);
 	}
 
 	/**
@@ -101,7 +102,7 @@ class PostRepository implements IPostRepository {
 	 * @return object or bool
 	 *
 	 */
-	public function getPostWithStatus(int $id, int $status_id){
+	public function getPostWhenStatus(int $id, int $status_id){
 		$data = [
 			'table'		=> 'posts',
 			'fields'	=> '*',
@@ -110,25 +111,68 @@ class PostRepository implements IPostRepository {
 			'limit'		=> 1
 		];
 
-		$post = $this->db->select($data);
-
-		if(count($post) > 0){
-			$post = $post[0];
-			$post->publish_at = $this->formateDateTime($post->publish_at, 'DateTimePicker');
-		}
-		
-		return $post;
+		return $this->db->select($data);
 	}
-
-	public function getPosts($offset);
 
 
 	/**
 	 *
-	 * check that all fields has values
+	 * Method to get all posts with there statuses with limit defined in the config file
+	 * @param $offset int 
+	 * @return array
 	 *
-	 */
-	private function isValid($data){
-		return ($data['title'] && $data['body'] && $data['summery'] && $data['status'] && $data['publish_at']);
+	 */	
+	public function getPosts(int $offset) {
+		$data = [
+			'table' => 'posts AS P, statuses AS S',
+			'fields' => ['P.id', 'P.title', 'P.summery', 'P.body', 'P.publish_at', 'S.status'],
+			'where' => 'WHERE P.status_id = S.id',
+			'bindings' => [],
+			'offset' => $offset,
+			'limit' => LIMIT,
+			'sort' => 'ORDER BY P.publish_at DESC',
+		];
+
+		return $this->db->select($data);
+	}
+
+
+
+	/**
+	 *
+	 * Method to get all posts that has a specific status_id
+	 * @param $offset int 
+	 * @return array
+	 *
+	 */	
+	public function getPostsWhenStatus(int $offset, int $status_id) {
+		
+		$data = [
+			'table' => 'posts',
+			'fields' => '*',
+			'where' => 'WHERE status_id= :status_id',
+			'bindings' => [':status_id' => $status_id],
+			'offset' => $offset,
+			'limit' => LIMIT,
+		];
+
+		return $this->db->select($data);
+	}
+
+	/**
+	 *
+	 * Method to search all posts with status 
+	 * @param $key string
+	 * @return array
+	 *
+	 */	
+	public function search(string $key) {
+		$data = [
+			'table' => 'posts',
+			'fields' => '*',
+			'where' => "WHERE ( title LIKE CONCAT('%', :title, '%') OR body LIKE CONCAT('%', :body, '%') ) AND status_id= :status_id",
+			'bindings' => [':title' => $key, ':body' => $key, ':status_id' => ACTIVE],
+		];
+		return $this->db->select($data);
 	}
 }

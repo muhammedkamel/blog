@@ -2,8 +2,9 @@
 require_once __DIR__.'/postsview.php';
 require_once __DIR__.'/../translations.php';
 require_once 'partials/header.php';
-require_once __DIR__.'/../controllers/ipscontroller.php';
+require_once __DIR__.'/../Controllers/IPsController.php';
 
+use Blog\Controllers\IPsController as IPsController;
 
 $ipsController = new IPsController;
 $ipsController->isBanned();

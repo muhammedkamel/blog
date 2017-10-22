@@ -1,8 +1,13 @@
 <?php
 
-require_once __DIR__.'/../controllers/postscontroller.php'; 
-require_once __DIR__.'/../controllers/statusescontroller.php'; 
-require_once __DIR__.'/../models/paginator.php';
+require_once __DIR__.'/../Controllers/PostsController.php'; 
+require_once __DIR__.'/../Controllers/StatusesController.php'; 
+require_once __DIR__.'/../Models/Paginator.php';
+
+use Blog\Controllers\PostsController as PostsController;
+use Blog\Controllers\StatusesController as StatusesController;
+use Blog\Models\Paginator as Paginator;
+
 class PostsView
 {
 

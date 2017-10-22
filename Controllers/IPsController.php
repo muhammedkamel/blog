@@ -1,16 +1,23 @@
 <?php
 
-require_once __DIR__ . '/../models/ip.php';
-require_once __DIR__.'/../models/paginator.php';
-require_once __DIR__ . '/../helpers/xxs-filter.php';
+namespace Blog\Controllers;
+
+require_once __DIR__ . '/../Models/IP.php';
+require_once __DIR__.'/../Models/Paginator.php';
+require_once __DIR__ . '/../Helpers/XSSFilter.php';
+
+use Blog\Helpers\XSSFilter as XSSFilter;
+use Blog\Models\IP as IP;
+use Blog\Models\Paginator as Paginator;
+use Blog\Repositories\IPRepository as IPRepo;
 
 class IPsController {
 
-	private $ip;
+	private $repo;
 	private $paginator;
 
 	public function __construct(){
-		$this->ip 			= new IP;
+		$this->repo 			= new IPRepo;
 		$this->paginator 	= new Paginator;
 	}
 
@@ -24,14 +31,7 @@ class IPsController {
 	
 	public function paginateIPs(int $offset = 0){
 		$offset = XSSFilter::globalXssClean($offset);
-		$data = [
-			'table' 	=> 'banned_ips',
-			'fields'	=> '*',
-			'offset'	=> $offset,
-			'limit'		=> LIMIT
-		];
-
-		return $this->ip->select($data);
+		return $this->repo->getIPs($offset);
 	}
 
 
@@ -59,9 +59,9 @@ class IPsController {
 	public function banIP(string $ip){
 		// @TODO check if it's ip and sanitize it
 		$ip = XSSFilter::globalXssClean($ip);
-		$data['ip'] 		= $ip;
-		$data['admin_id'] 	= 1;
-		if($this->ip->insertRecord('banned_ips', $data)){
+		// 1 => admin id 
+		$newIP = new IP($ip, 1);
+		if($newIP->save()){
 			echo json_encode(['success' => true]);
 	        exit;
 	    }else{
@@ -79,7 +79,7 @@ class IPsController {
 	
 	public function allowIP(int $id){
 		$id = XSSFilter::globalXssClean($id);
-		if($this->ip->deleteByID('banned_ips', $id)){
+		if($this->repo->deleteIP($id)){
 			echo json_encode(['success' => true]);
 	        exit;
 	    }else{
@@ -98,20 +98,10 @@ class IPsController {
 	
 	public function getIP(int $id){
 		$id = XSSFilter::globalXssClean($id);
-		$data = [
-			'table'		=> 'banned_ips',
-			'fields'	=> '*',
-			'where'		=> 'WHERE id=:id',
-			'bindings'	=> [':id' => $id],
-			'limit'		=> 1
-		];
-
-		$ipInfo = $this->ip->select($data);
-		if($ipInfo) $ipInfo = $ipInfo[0];
-
-		if($ipInfo){
+		$ip = $this->repo->getIP($id);
+		if($ip){
 			header('Content-Type: application/json');
-			echo json_encode($ipInfo);
+			echo json_encode($ip);
 	        exit;
 	    }else{
 	        header('HTTP/1.1 503 Service Temporarily Unavailable');
@@ -130,7 +120,7 @@ class IPsController {
 		$id = XSSFilter::globalXssClean($id);
 		$ip = XSSFilter::globalXssClean($ip);
 		// @TODO validate $data
-		if($this->ip->update('banned_ips', ['ip'],'WHERE id= :id LIMIT 1', [':id' => $id, ':ip' => $ip])){
+		if($this->repo->editIP($id, $ip)){
 			echo json_encode(['success' => true]);
 	        exit;
 	    }else{
@@ -149,17 +139,7 @@ class IPsController {
 	
 	public function isBanned(){
 		$ip = $this->getRealIpAddr();
-		$data = [
-			'table'		=> 'banned_ips',
-			'fields'	=> ['COUNT(1) AS count'],
-			'where'		=> 'WHERE ip=:ip',
-			'bindings'	=> [':ip' => $ip],
-			'limit'		=> 1
-		];
-
-		$ipInfo = $this->ip->select($data);
-
-		if(isset($ipInfo[0]) && $ipInfo[0]->count > 0){
+		if($this->repo->isExists($ip)){
 			header('Location: '.ROOT_URL.'401.php');
 			exit;
 		}

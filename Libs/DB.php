@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\Models;
+namespace Blog\Libs;
 
 require_once __DIR__ . '/../config.php';
 
@@ -18,9 +18,9 @@ class DB {
 	public function __construct() {
 		try {
 			// PDO connect
-			$this->conn = new PDO('mysql:host=' . HOST . ';dbname=' . DBNAME, USERNAME, PASSWORD);
-			$this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		} catch (PDOException $e) {
+			$this->conn = new \PDO('mysql:host=' . HOST . ';dbname=' . DBNAME, USERNAME, PASSWORD);
+			$this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+		} catch (\PDOException $e) {
 			echo 'ERROR: ' . $e->getMessage();
 		}
 	}
@@ -89,16 +89,8 @@ class DB {
 		}
 		return $query;
 	}
-	// public function bind_where($where) {
-	// 	$where_stmt = "";
-	// 	$bindings 	= [];
-	// 	foreach ($where as $field => $value) {
-	// 		$where_stmt .= $field . ' = :' . $field;
-	// 		$bindings[':'.$field] = $value;
-	// 	}
-	// 	return ['where_stmt' => $where_stmt, 'bindings' => $bindings];
-	// }
-
+	
+	
 	/**
 	 *
 	 * Method to fetch data as array of objects

@@ -1,7 +1,10 @@
 <?php
 
-require_once __DIR__.'/../../../controllers/ipscontroller.php';
-require_once __DIR__.'/../../../helpers/authenticate.php';
+require_once __DIR__.'/../../../Controllers/IPsController.php';
+require_once __DIR__.'/../../../Helpers/Authenticate.php';
+
+use Blog\Controllers\IPsController as IPsController;
+use Blog\Helpers\Authenticate as Authenticate;
 
 // check if it's banned
 $ipsController = new IPsController;

@@ -6,7 +6,7 @@ require_once __DIR__ . '/../Repositories/IPRepository.php';
 
 use Blog\Repositories\IPRepository as IPRepo;
 
-class Post {
+class IP {
 
 	private $repo;
 	private $ip;
@@ -37,7 +37,7 @@ class Post {
 	 */
 	public function save() {
 		if ($this->canInsert()) {
-			return $this->repo->addPost($this->title, $this->body, $this->summery, $this->status, $this->publish_at, $this->admin_id);
+			return $this->repo->addIP($this->ip, $this->admin_id);
 		}
 		return false;
 	}

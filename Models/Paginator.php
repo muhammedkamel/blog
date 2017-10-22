@@ -1,6 +1,9 @@
 <?php
+namespace Blog\Models;
 
-require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/../Libs/DB.php';
+
+use Blog\Libs\DB as DB;
 
 class Paginator extends DB {
 

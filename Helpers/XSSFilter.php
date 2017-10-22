@@ -1,4 +1,6 @@
 <?php
+namespace Blog\Helpers;
+
 
 /**
  * Class Common To clean the XSS

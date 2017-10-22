@@ -1,7 +1,14 @@
 <?php 
-require_once __DIR__.'/../models/db.php';
-require_once __DIR__.'/../helpers/session.php';
-require_once __DIR__ . '/../helpers/xxs-filter.php';
+
+namespace Blog\Helpers;
+
+require_once __DIR__.'/../Libs/DB.php';
+require_once __DIR__.'/../Helpers/session.php';
+require_once __DIR__ . '/../Helpers/XSSFilter.php';
+
+use Blog\Libs\DB as DB;
+use Blog\Helpers\XSSFilter as XSSFilter;
+
 
 class Authenticate
 {
@@ -28,7 +35,7 @@ class Authenticate
         $password = XSSFilter::globalXssClean($password);
         
     	if($id = intval($this->isUser($username, $password))){
-    		Session::put('username', $username);
+    		\Session::put('username', $username);
     		header('Location: admin/html/posts.php');
     	}else{
     		require_once ROOT_DIR.'/translations.php';
@@ -42,7 +49,7 @@ class Authenticate
      *
      */
     public function is_loggedin(){
-    	if(!Session::has('username')){
+    	if(!\Session::has('username')){
     		header('Location: '.ROOT_URL.'views/login.php');
             exit;
     	}
@@ -79,7 +86,7 @@ class Authenticate
      *
      */
     public function logout(){
-        Session::flush();
+        \Session::flush();
         header('Location: '.ROOT_URL.'views/login.php');
     }
 
