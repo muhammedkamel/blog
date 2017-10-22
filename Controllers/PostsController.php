@@ -13,7 +13,7 @@ class PostsController {
 
 	private $repo;
 
-	public function __construct(){
+	public function __construct() {
 		$this->repo = new PostRepo;
 	}
 
@@ -26,6 +26,7 @@ class PostsController {
 	 */
 	public function paginatePosts(int $offset) {
 		$posts = $this->repo->getPostsWhenStatus($offset, ACTIVE);
+		$posts = XSSFilter::escape($posts);
 		return $this->formateArrayDates($posts);
 	}
 
@@ -38,6 +39,7 @@ class PostsController {
 	 */
 	public function paginatePostsWithStatus(int $offset) {
 		$posts = $this->repo->getPosts($offset);
+		$posts = XSSFilter::escape($posts);
 		return $this->formateArrayDates($posts);
 	}
 
@@ -78,10 +80,12 @@ class PostsController {
 			$post = $this->repo->getPost($id);
 		}
 
-		if(count($post) > 0){
+		if (count($post) > 0) {
 			$post = $post[0];
+			$post = XSSFilter::escape($post);
 			$post->publish_at = $this->formateDateTime($post->publish_at, 'DateTimePicker');
 		}
+		$post = XSSFilter::escape($post);
 		return $post;
 	}
 
@@ -156,6 +160,7 @@ class PostsController {
 	public function search(string $key) {
 		$key = XSSFilter::globalXssClean($key);
 		$posts = $this->repo->search($key);
+		$posts = XSSFilter::escape($posts);
 		return $this->formateArrayDates($posts);
 	}
 }
